@@ -1,17 +1,16 @@
-asteroids
-=========
+# asteroids
 
-# TODO
+## TODO
 
-## Common
+### Common
 * Agree on communication draft spec
 
-## Monitor
+### Monitor
 * ?
 
-## Controller
+### Controller
 * ?
 
-## Server
+### Server
 * ?
 
