@@ -2,9 +2,6 @@
 
 ## TODO
 
-### Common
-* Agree on communication draft spec
-
 ### Monitor
 Server -> global frame state:
 
@@ -58,7 +55,11 @@ Server -> global frame state:
       ],
       "whitehole": [
         0, 0, 0, /* x, y, size */
+      ],
+      "explosions": [
+        0, 0, 0, /* x, y, size */
       ]
+      "shake": 0 /* amount of shake 0-10 */
     }
 
 ### Controller
@@ -77,9 +78,44 @@ User input message -> server:
     }
 
 ### Server
-* ?
-
-
+* Collision
+* Explosions
+* Ship
+  * Collision
+    * asteroid
+    * ship
+    * bullet
+    * rocket
+    * mine
+    * drone
+    * turret
+* Rocket
+  * Collision
+    * asteroid
+    * ship
+    * drone
+    * turret
+* Bullet
+  * Collision
+    * asteroid
+    * ship
+    * drone
+    * turret
+* Gravity generators
+  * black holes
+  * white holes
+  * explosions
+* Gravity targets
+  * asteroid
+  * ship
+  * bullet
+  * rocket
+  * mine
+  * drone
+  * turret
+* AI players
+* Drone AI
+* Turret
 
 
 
