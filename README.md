@@ -6,7 +6,7 @@
 * Agree on communication draft spec
 
 ### Monitor
-Input:
+Server -> global frame state:
 
     {
       "players":[{
@@ -20,6 +20,8 @@ Input:
         "shield": {
           value: 0,
           type: 'repulsor|force|random'
+        },
+        "type": "fast|fat"
       }],
       "asteroids":[
         0,0,0, /* x, y, size */
@@ -60,8 +62,25 @@ Input:
     }
 
 ### Controller
-* ?
+Setup message -> server:
+
+    {
+        "name": "Red",
+        "color": "red",
+        "shiptype": "fast|fat"
+    }
+
+User input message -> server:
+
+    {
+        "buttons": [1|0, 1|0, 1|0, 1|0, 1|0, 1|0, 1|0, 1|0, 1|0], /* up, right, left, down, fire primary, fire secondary, shield, next primary weapon, prev primary weapon  */
+    }
 
 ### Server
 * ?
+
+
+
+
+
 
