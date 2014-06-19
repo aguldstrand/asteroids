@@ -46,9 +46,9 @@ Server -> global frame state:
         0, 0, 0, /* x, y, angle */
       ],
       "turrets": [
-        0, 0, 0, /* x, y, angle */
-        0, 0, 0, /* x, y, angle */
-        0, 0, 0, /* x, y, angle */
+        0, 0, 0, 0, /* x, y, angle, type(0=shield, 1=bullet) */
+        0, 0, 0, 0, /* x, y, angle, type(0=shield, 1=bullet) */
+        0, 0, 0, 0, /* x, y, angle, type(0=shield, 1=bullet) */
       ],
       "blackhole": [
         0, 0, 0, /* x, y, size */
@@ -116,7 +116,11 @@ User input message -> server:
 * AI players
 * Drone AI
 * Turret
-
+  Sticks to the closest asteroid. Can aim ~30° and rotates with the asteroid. Is destroyed with the asteroid. Asteroids can have both turrets and shields.
+  * Targets
+    * ships
+    * turrets
+    * drones
 
 
 
