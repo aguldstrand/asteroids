@@ -78,10 +78,13 @@ User input message -> server:
     }
 
 ### Server
+
+#### Collision
+
+#### Explosions
+
+#### Ship
 * Collision
-* Explosions
-* Ship
-  * Collision
     * asteroid
     * ship
     * bullet
@@ -89,35 +92,43 @@ User input message -> server:
     * mine
     * drone
     * turret
-* Rocket
-  * Collision
+
+#### Rocket
+* Collision
     * asteroid
     * ship
     * drone
     * turret
-* Bullet
-  * Collision
+
+#### Bullet
+* Collision
     * asteroid
     * ship
     * drone
     * turret
-* Gravity generators
-  * black holes
-  * white holes
-  * explosions
-* Gravity targets
-  * asteroid
-  * ship
-  * bullet
-  * rocket
-  * mine
-  * drone
-  * turret
-* AI players
-* Drone AI
-* Turret
-  Sticks to the closest asteroid. Can aim ~30° and rotates with the asteroid. Is destroyed with the asteroid. Asteroids can have both turrets and shields.
-  * Targets
+
+#### Gravity generators
+* black holes
+* white holes
+* explosions
+
+#### Gravity targets
+* asteroid
+* ship
+* bullet
+* rocket
+* mine
+* drone
+* turret
+
+#### AI players
+
+#### Drone AI
+
+#### Turret
+Sticks to the closest asteroid. Can aim ~30° and rotates with the asteroid. Is destroyed with the asteroid. Asteroids can have both turrets and shields.
+
+* Targets
     * ships
     * turrets
     * drones
