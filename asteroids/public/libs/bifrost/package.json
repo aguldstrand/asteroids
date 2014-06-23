@@ -1,0 +1,10 @@
+{
+  "name": "Bifrost",
+  "version": "0.1.0",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-requirejs": "~0.4.3",
+    "grunt-contrib-copy": "~0.5.0"
+  }
+}
