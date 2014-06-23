@@ -55,6 +55,27 @@
 	}
 	</script>
 
+	 <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        var io = io.connect();
+
+        // monitor
+        io.emit('monitor:connect');
+        io.on('monitor:game-state', function(state) {
+            // update playing field
+        });
+
+        // controller
+        io.emit('controller:connect', {
+            name: 'apap'
+            // etc from spec
+        });
+        io.emit('controller:input', [1, 0, 1, 0, 1, 1, 1]);
+
+
+    </script>
+
 
 
 	<div id="tracker-sel" style="position:fixed; z-index:88000;"></div>
