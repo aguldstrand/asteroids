@@ -1,5 +1,6 @@
 var Point = require('./Point')
 var Matrix = require('./Matrix')
+var TriangleCheck = require('./TriangleCheck')
 
 function GameLoop(options) {
 	this.sendGameState = options.sendGameState;
