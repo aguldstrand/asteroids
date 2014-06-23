@@ -1,7 +1,605 @@
+var Point = require('./Point')
+var Matrix = require('./Matrix')
+
 function GameLoop(options) {
 	this.sendGameState = options.sendGameState;
 	this.running = false;
+
+	this.gameModel = options.gameModel;
+
+	this.c = null; //:Counter;
+	this.SW = 0; //:int;
+	this.SH = 0; //: int;
+
+	this.LwingP = null; //: Point;
+	this.RwingP = null; //: Point;
+	this.noseP = null; //: Point;
+
+	this.shiplLayout = null; //: Vector. < Point > ;
+
+	this.maxBulletsInGame = 60;
+
+	this.maxBulletsPerShips = 10;
+
+	this.frameCounter = 0;
+
+	this.speed = 350;
+	this.friction = .9;
+	this.bulletSpeed = 150;
+	this.piOver180 = Math.PI / 180;
+	this.collideFlags = null;
+
+	this.gravity = null; //: Vector. < Point > ;
+
+	this.gravityRes = null; //: int;
+	this.gravityDebug = null; //: Array;
 }
+
+GameLoop.prototype.init = function() {
+	this.c = new Counter();
+	this.SW = this.gameModel.SW;
+	this.SH = this.gameModel.SH;
+
+	this.collideFlags = [];
+
+	this.LwingP = new Point(-20, -20);
+	this.RwingP = new Point(-20, 20);
+	this.noseP = new Point(40, 0);
+
+	this.shiplLayout = [LwingP, RwingP, noseP];
+
+	this.gravityDebug = [];
+	this.gravityRes = 25;
+	var gLen = parseInt(SW / gravityRes, 10) * parseInt(SH / gravityRes, 10);
+	this.gravity = [];
+	for (var i = 0; i < gLen; i++) {
+		gravity[i] = new Point();
+	}
+}
+
+GameLoop.prototype.degreesToRadians = function(degrees) {
+	return degrees * Math.PI / 180;
+};
+
+GameLoop.prototype.update = function(step /* milliseconds */ ) {
+
+	this.frameCounter++;
+
+	var numExplosions = this.gameModel.explosions.length;
+	var numShips = this.gameModel.ships.length;
+	var numAsteroids = this.gameModel.asteroids.length;
+	var shipAcc = new Point();
+
+
+	//var test:int = Math.min(numAsteroids, 1);
+	var numBulletsInShip;
+	for (var y = 0; y < parseInt(SH / gravityRes, 10); y++) {
+		for (var x = 0; x < parseInt(SW / gravityRes, 10); x++) {
+			var xgra = 0;
+			var ygra = 0;
+
+			for (var aaa = 0; aaa < numExplosions; aaa++) {
+				var ast = this.gameModel.explosions[aaa];
+
+				// relative pos
+				var __dx = x * gravityRes - ast.pos.x;
+				var __dy = y * gravityRes - ast.pos.y;
+
+				// normalize (lent = 1)
+				var relativePos = new Point(__dx, __dy);
+
+				var normalizedRelativepos = relativePos.clone();
+				normalizedRelativepos.normalize(1);
+
+				// multiply gravity force size
+				var gravForceSize = Math.pow(1 / relativePos.length, 1.5) * +ast.size * 50000;
+
+				var _____x = normalizedRelativepos.x * gravForceSize;
+				var _____y = normalizedRelativepos.y * gravForceSize;
+
+				xgra += _____x;
+				ygra += _____y;
+			}
+
+			gravity[int(x + y * SW / gravityRes)].x = xgra;
+			gravity[int(x + y * SW / gravityRes)].y = ygra;
+			//trace(int(x + y * SW / gravityRes));
+		}
+
+	}
+
+	var userInputs = this.gameModel.userInputs;
+	for (var i in userInputs) {
+		if (userInputs.hasOwnProperty(i)) {
+			var userInput = userInputs[i];
+			userInput.shake = false;
+		}
+	}
+
+	var matrix = new Matrix();
+
+	//var numBullets:uint = GameModel.getInstance().bullets.length;
+
+
+	var pa;
+	var pb;
+	var pc;
+
+	var secs = step / 1000;
+
+
+	for (var e = 0; e < numExplosions; e++) {
+		var explosion = this.gameModel.explosions[e];
+		explosion.size--;
+		if (explosion.size < 1) {
+			this.gameModel.explosions.splice(e, 1);
+			numExplosions--;
+		}
+	}
+
+	// MOVE SHIPS (BASED ON USER INPUT)			
+	for (var s = 0; s < numShips; s++) {
+		var ship = this.gameModel.ships[s];
+		shipAcc = new Point(0, 0);
+		var userInput = this.gameModel.userInputs[ship.name];
+
+		if (userInput.left) {
+
+			if (userInput.thrust) {
+				ship.rot -= 1;
+			} else {
+				ship.rot -= 6;
+			}
+
+
+			if (ship.rot < 0) {
+				ship.rot = 360;
+			}
+		}
+		if (userInput.right) {
+			if (userInput.thrust) {
+				ship.rot += 1;
+			} else {
+				ship.rot += 6;
+			}
+
+			ship.rot %= 360;
+		}
+
+
+		if (userInput.thrust) {
+			shipAcc.x += (Math.cos(this.degreesToRadians(ship.rot)) * speed);
+			shipAcc.y += (Math.sin(this.degreesToRadians(ship.rot)) * speed);
+		} else {
+
+		}
+
+		numBulletsInShip = ship.bullets.length;
+
+		if (userInput.shoot && numBulletsInShip < maxBulletsPerShips) {
+			matrix.identity();
+			matrix.rotate(ship.rot * piOver180);
+			var newBullet = new Bullet();
+			var transFormedPoint = matrix.transformPoint(noseP);
+			newBullet.pos.x = ship.pos.x + transFormedPoint.x;
+			newBullet.pos.y = ship.pos.y + transFormedPoint.y;
+			newBullet.vel.x = transFormedPoint.x * bulletSpeed;
+			newBullet.vel.y = transFormedPoint.y * bulletSpeed;
+			newBullet.direction = ship.rot + 90;
+			newBullet.maxVel = 250;
+			newBullet.friction = 0;
+			ship.bullets.push(newBullet);
+			numBulletsInShip++;
+		}
+
+		ship.pos.x %= SW;
+		ship.pos.y %= SH;
+
+		if (ship.pos.x < 0) {
+			ship.pos.x = SW - 1;
+		}
+		if (ship.pos.y < 0) {
+			ship.pos.y = SH - 1;
+		}
+
+		//var g:Point = gravity[int( int(ship.pos.x / gravityRes) + int(ship.pos.y / gravityRes) * int(SW / gravityRes))];				
+		//ship.vel.x += g.x;
+		//ship.vel.y += g.y;
+
+		this.applyNewPositions(ship, shipAcc, secs);
+		//ship.pos.x += ship.vel.x*secs + g.x;
+		//ship.pos.y += ship.vel.y*secs + g.y;
+
+
+
+		for (var mb = 0; mb < numBulletsInShip; mb++) {
+			var bullet = ship.bullets[mb];
+
+
+
+			if (bullet.pos.x >= SW || bullet.pos.x < 0 || bullet.pos.y < 0 || bullet.pos.y >= SH) {
+				//GameModel.getInstance().bullets.splice(mb, 1);
+				ship.bullets.splice(mb, 1);
+				numBulletsInShip--;
+				//
+			} else {
+				//var gb:Point = gravity[int( int(bullet.pos.x / gravityRes) + int(bullet.pos.y / gravityRes) * int(SW / gravityRes))];
+				//bullet.vel.x += gb.x;
+				//bullet.vel.y += gb.y;
+
+				this.applyNewPositions(bullet, new Point(), secs);
+				//bullet.pos.x += Math.sin(bullet.direction * piOver180 ) * bulletSpeed * secs + gb.x;
+				//bullet.pos.y -= Math.cos(bullet.direction * piOver180 ) * bulletSpeed * secs - gb.y;	
+			}
+			//
+		}
+
+
+
+	}
+
+
+
+	// MOVE ASTEROIDS
+
+	for (var a = 0; a < numAsteroids; a++) {
+		var asteroid = this.gameModel.asteroids[a];
+
+
+
+		asteroid.pos.x %= SW;
+		asteroid.pos.y %= SH;
+
+		if (asteroid.pos.x < 0) {
+			asteroid.pos.x = SW - 1;
+		}
+		if (asteroid.pos.y < 0) {
+			asteroid.pos.y = SH - 1;
+		}
+
+
+		//var ag:Point = getGravity(asteroid.pos);
+		//asteroid.vel.x += ag.x;
+		//asteroid.vel.y += ag.y;
+		this.applyNewPositions(asteroid, new Point(), secs);
+
+
+		//asteroid.pos.x += asteroid.vel.x * secs + ag.x;
+		//asteroid.pos.y += asteroid.vel.y * secs + ag.y;
+		//Tracker.track("ASteroid : " + asteroid.pos.x);
+	}
+
+
+	//MOVE BULLETS      //bullets are now inside ship
+
+	//for (var mb:uint = 0; mb < numBullets; mb++) {
+	//var bullet:Bullet = GameModel.getInstance().bullets[mb];
+	//bullet.pos.x += Math.sin(bullet.direction * piOver180 )* bulletSpeed * secs;
+	//bullet.pos.y -= Math.cos(bullet.direction * piOver180 )* bulletSpeed * secs;				
+	//
+	//if (bullet.pos.x > SW || bullet.pos.x < 0 || bullet.pos.y < 0 || bullet.pos.y > SH) {
+	//GameModel.getInstance().bullets.splice(mb, 1);
+	//numBullets--;
+	//
+	//}
+	//
+	//}
+
+
+	//SHIP BULLET COLLISON DETECTION
+	for (var sbc = 0; sbc < numShips; sbc++) {
+		ship = this.gameModel.ships[sbc];
+
+		pa = new Point();
+		pa.x = ship.pos.x + shiplLayout[0].x;
+		pa.y = ship.pos.y + shiplLayout[0].y;
+
+		pb = new Point();
+		pb.x = ship.pos.x + shiplLayout[1].x;
+		pb.y = ship.pos.y + shiplLayout[1].y;
+
+		pc = new Point();
+		pc.x = ship.pos.x + shiplLayout[2].x;
+		pc.y = ship.pos.y + shiplLayout[2].y;
+
+		for (var ssbc = 0; ssbc < numShips; ssbc++) {
+			var shipSSBC = this.gameModel.ships[ssbc];
+			var numBulletsSSBC = shipSSBC.bullets.length;
+
+			for (var bsc = 0; bsc < numBulletsSSBC; bsc++) {
+				//bullet = GameModel.getInstance().bullets[bsc];
+				bullet = shipSSBC.bullets[bsc];
+
+				if (TriangleCheck.check(pa, pb, pc, bullet.pos)) {
+					numBulletsSSBC--;
+					shipSSBC.bullets.splice(bsc, 1);
+					shipSSBC.score += 15;
+					//GameModel.getInstance().bullets.splice(bsc, 1);
+					//numBullets--;
+					shipCollision(ship);
+				}
+			}
+		}
+	}
+
+	//BULLET ASTEROIDS COLLISION DETECTION
+	for (var bac = 0; bac < numAsteroids; bac++) {
+		asteroid = this.gameModel.asteroids[bac];
+
+
+		for (var sbac = 0; sbac < numShips; sbac++) {
+
+			var shipSBAC = this.gameModel.ships[sbac];
+			var numBulletsSBAC = shipSBAC.bullets.length;
+
+
+			for (var abc = 0; abc < numBulletsSBAC; abc++) {
+				//bullet = GameModel.getInstance().bullets[abc];
+				bullet = shipSBAC.bullets[abc];
+
+				var _dx = bullet.pos.x - asteroid.pos.x;
+				var _dy = bullet.pos.y - asteroid.pos.y;
+
+				var _dist = Math.sqrt((_dx * _dx) + (_dy * _dy)) - 0 - asteroid.diam;
+
+
+				if (_dist < 0) {
+					//numBullets--;
+					shipSBAC.score += 10;
+					numBulletsSBAC--;
+					//GameModel.getInstance().bullets.splice(abc, 1);
+					shipSBAC.bullets.splice(abc, 1);
+
+					this.gameModel.asteroids.splice(bac, 1);
+					numAsteroids += removeAsteroid(asteroid);
+				}
+			}
+		}
+	}
+
+
+	//SHIP ON SHIP COLLISION
+	if (frameCounter % 25 == 0) {
+		//Tracker.track(" clearing collide flags ");
+		collideFlags = new Array();
+	}
+	var checkCollision = true;
+	for (var ssc = 0; ssc < numShips; ssc++) {
+		var shipA = this.gameModel.ships[ssc];
+		//var shipA_np:Point = new Point(shipA.pos.x + noseP.x, shipA.pos.y + 
+		checkCollision = true;
+		for (var coll = 0; coll < collideFlags.length; coll++) {
+
+			if (collideFlags[coll] == ssc) {
+				checkCollision = false;
+				//Tracker.track(" dont do colllision check ");
+			}
+		}
+		if (checkCollision) {
+			for (var ssb = 0; ssb < numShips; ssb++) {
+				var shipB = this.gameModel.ships[ssb]
+
+
+
+				if (ssc != ssb) { //rough collision detection.
+					var __dx = shipA.pos.x - shipB.pos.x;
+					var __dy = shipA.pos.y - shipB.pos.y;
+					var __dist = Math.sqrt((__dx * __dx) + (__dy * __dy));
+
+
+					if (__dist < 150) {
+
+
+						//finer collision detection
+
+						//ship A points
+						pa = new Point();
+						pa.x = shipA.pos.x + shiplLayout[0].x;
+						pa.y = shipA.pos.y + shiplLayout[0].y;
+						pb = new Point();
+						pb.x = shipA.pos.x + shiplLayout[1].x;
+						pb.y = shipA.pos.y + shiplLayout[1].y;
+						pc = new Point();
+						pc.x = shipA.pos.x + shiplLayout[2].x;
+						pc.y = shipA.pos.y + shiplLayout[2].y;
+
+						//ship B points
+						var b_pa = new Point();
+						b_pa.x = shipB.pos.x + shiplLayout[0].x;
+						b_pa.y = shipB.pos.y + shiplLayout[0].y;
+						var b_pb = new Point();
+						b_pb.x = shipB.pos.x + shiplLayout[1].x;
+						b_pb.y = shipB.pos.y + shiplLayout[1].y;
+						var b_pc = new Point();
+						b_pc.x = shipB.pos.x + shiplLayout[2].x;
+						b_pc.y = shipB.pos.y + shiplLayout[2].y;
+
+						if (TriangleCheck.check(pa, pb, pc, b_pa) || TriangleCheck.check(pa, pb, pc, b_pb) || TriangleCheck.check(pa, pb, pc, b_pc)) {
+
+							collideFlags.push(ssb, ssc);
+							//Tracker.track(" ship on ship collision " + shipA.name + " : " + shipB.name);
+
+							var temp = shipA.vel;
+							shipA.vel = shipB.vel;
+							shipB.vel = temp;
+
+							//shipA.pos.x -= 10;
+							//shipA.pos.y -= 10;
+							//
+							//shipB.pos.x += 10;
+							//shipB.pos.y += 10;
+
+							//var tempPos:Point = shipA.pos;
+							//shipA.pos = shipB.pos;
+							//shipB.pos = tempPos;
+
+							shipA.rot += Math.random() * 10 + 10;
+							shipB.rot += Math.random() * 15 + 15;
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+
+	// SHIP ASTEROIDS COLLISION DETECTION
+	for (var sc = 0; sc < numShips; sc++) {
+
+		ship = this.gameModel.ships[sc];
+		for (var ac = 0; ac < numAsteroids; ac++) {
+
+			asteroid = this.gameModel.asteroids[ac];
+
+
+			//loop shiplayout
+			for (var sl = 0; sl < 3; sl++) {
+				if (numShips > 0) {
+					var dx = (ship.pos.x + shiplLayout[sl].x) - asteroid.pos.x;
+					var dy = (ship.pos.y + shiplLayout[sl].y) - asteroid.pos.y;
+
+					var dist = Math.sqrt((dx * dx) + (dy * dy)) - 8 - asteroid.diam;
+
+					if (dist < 0) {
+
+						this.gameModel.asteroids.splice(ac, 1);
+						//numAsteroids--;			
+						numAsteroids += removeAsteroid(asteroid);
+						/*
+									if (asteroid.diam > 15) {
+										for (var na:uint = 0; na < 3; na++) {
+											var newAsteroid:Asteroid = new Asteroid();
+											newAsteroid.diam = asteroid.diam / 3;
+											newAsteroid.pos = asteroid.pos;
+											newAsteroid.vel.x = asteroid.vel.x * Math.random() * 2 -1;
+											newAsteroid.vel.y = asteroid.vel.y * Math.random() * 2 -1;
+											GameModel.getInstance().asteroids.push(newAsteroid);
+											numAsteroids++;
+										}
+									}
+									*/
+
+						this.shipCollision(ship);
+
+						//GameModel.getInstance().ships.splice(sc, 1);
+						//numShips--;								
+						//Tracker.track(" SHIP "+ship.name+" COLLIDED WITH ASTEROID " );
+					}
+				}
+			}
+		}
+	}
+	if (numAsteroids < 1) {
+		createAsteroids();
+	}
+}
+
+GameLoop.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ , secs /*Number*/ ) {
+
+	var g = this.getGravity(obj.pos);
+	obj.acc.x = g.x + acc.x;
+	obj.acc.y = g.y + acc.y;
+
+
+	if (obj.vel.length > 0.1) {
+		var frictionP = new Point(-obj.vel.x, -obj.vel.y);
+		frictionP.normalize(obj.friction);
+		obj.acc.x += frictionP.x;
+		obj.acc.y += frictionP.y;
+	}
+
+	obj.vel.x += obj.acc.x * secs;
+	obj.vel.y += obj.acc.y * secs;
+
+	if (obj.vel.length > obj.maxVel) {
+		obj.vel.normalize(obj.maxVel);
+	}
+
+
+
+	obj.pos.x += obj.vel.x * secs;
+	obj.pos.y += obj.vel.y * secs;
+}
+
+GameLoop.prototype.getGravity = function(pos /*Point*/ ) {
+
+	var _x = parseInt(pos.x, 10) / gravityRes;
+	var _y = parseInt(pos.y, 10) / gravityRes;
+
+	var gravW = this.SW / gravityRes;
+
+	var index = _y * gravW + _x;
+
+	//trace("point x  : " + pos.x);
+	//trace("point y  : " + pos.y);
+	//trace("_x : " + _x);
+	//trace("_y : " + _y);
+	//trace("gravW : " + gravW);
+	//trace("index: " + index);
+
+
+	var grav = gravity[index];
+	return grav;
+}
+
+GameLoop.prototype.createAsteroids = function() {
+	for (var i = 0; i < 10; i++) {
+		var asteroid = new Asteroid();
+		asteroid.diam = Math.random() * 20 + 20;
+		asteroid.friction = 0;
+		asteroid.maxVel = 20;
+		asteroid.pos = Math.random() > .5 ? new Point(0, Math.random() * SH) : new Point(Math.random() * SW, 0);
+		asteroid.vel = Math.random() > .5 ? new Point(Math.random() * 5 + 5, Math.random() * 5 + 5) : new Point(Math.random() * -5 - 5, Math.random() * -5 - 5);
+
+		this.gameModel.asteroids.push(asteroid);
+	}
+}
+
+GameLoop.prototype.removeAsteroid = function(asteroid /*Asteroid*/ ) {
+
+	var ret = -1;
+
+	var pos = new Point(asteroid.pos.x, asteroid.pos.y);
+	var size = asteroid.diam;
+	createExplosion(size, pos);
+
+	if (size > 22) {
+		for (var na = 0; na < 3; na++) {
+			var newAsteroid = new Asteroid();
+			newAsteroid.diam = size / 3;
+			newAsteroid.pos = asteroid.pos;
+			newAsteroid.friction = 0;
+			newAsteroid.maxVel = 30;
+			newAsteroid.vel.x = asteroid.vel.x * Math.random() * 1 - asteroid.vel.x * 2;
+			newAsteroid.vel.y = asteroid.vel.y * Math.random() * 1 - asteroid.vel.y * 2;
+			this.gameModel.asteroids.push(newAsteroid);
+			ret++;
+		}
+	}
+	return ret;
+};
+
+GameLoop.prototype.shipCollision = function(ship /*Ship*/ ) {
+	var pos = new Point(ship.pos.x, ship.pos.y);
+	this.createExplosion(20, pos);
+
+	var userInput = this.gameModel.userInputs[ship.name];
+	userInput.shake = true;
+
+
+	ship.pos.x = SW * .5;
+	ship.pos.y = SH * .5;
+};
+
+GameLoop.prototype.createExplosion = function(size /*int*/ , pos /*Point*/ ) {
+	var explosion = new Explosion();
+	explosion.pos = pos;
+	explosion.size = size;
+	this.gameModel.explosions.push(explosion);
+};
+
+
 
 GameLoop.prototype.start = function() {
 	this.running = true;
