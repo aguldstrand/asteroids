@@ -378,5 +378,20 @@
   })();
 
 
+  this.performance = (function() {
+    return window.performance || {};
+  }());
+
+  this.performance.now = (function() {
+    return this.performance.now ||
+      this.performance.webkitNow ||
+      this.performance.mozNow || 
+      this.performance.msNow ||
+      this.performance.oNow ||
+      function() {
+        return (new Date()).getTime();
+      };
+  }());
+
 
 }());
