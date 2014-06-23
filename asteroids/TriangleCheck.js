@@ -1,10 +1,8 @@
 var Point = require('./Point');
 
-public
-
 function TriangleCheck() {}
 
-TriangleCheck.check = function(t1: Point, t2: Point, t3: Point, point: Point) {
+TriangleCheck.check = function(t1, t2, t3, point) {
 	var invDenom;
 	var u;
 	var v;
@@ -41,7 +39,7 @@ TriangleCheck.check = function(t1: Point, t2: Point, t3: Point, point: Point) {
 	return (u > 0) && (v > 0) && (u + v < 1);
 }
 
-TriangleCheck.dot = function(vect1: Array, vect2: Array) {
+TriangleCheck.dot = function(vect1, vect2) {
 	return (vect1[0] * vect2[0] + vect1[1] * vect2[1]);
 }
 
