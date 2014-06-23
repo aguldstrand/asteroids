@@ -1,8 +1,28 @@
-define(['Bifrost', 'monitor/gui/screen/ScreenComponent'], function(Bifrost, ScreenComponent) {
+define([
+	'Bifrost',
+
+	'monitor/gui/screen/ScreenComponent',
+
+	'controller/controls/keyboard',
+	'controller/controls/gamepad',
+	'controller/controls/mouse'
+], function(
+	Bifrost,
+
+	ScreenComponent,
+
+	Keyboard,
+	Gamepad,
+	Mouse
+) {
 
 	function MainComponent(options) {
 		if (options) {
 			Bifrost.BaseComponent.call(this, options);
+
+			Bifrost.Keyboard = new Keyboard();
+			Bifrost.Gamepad = new Gamepad();
+			Bifrost.Mouse = new Mouse();
 		}
 	}
 
@@ -11,6 +31,11 @@ define(['Bifrost', 'monitor/gui/screen/ScreenComponent'], function(Bifrost, Scre
 
 	MainComponent.prototype.render = function() {
 		this.baseRender('main', {});
+
+
+		this.$el.append('<div id="keyboard">');
+		this.$el.append('<div id="gamepad">');
+		this.$el.append('<div id="mouse">');
 	};
 
 
@@ -42,6 +67,10 @@ define(['Bifrost', 'monitor/gui/screen/ScreenComponent'], function(Bifrost, Scre
 		this.time = current;
 
 		this.components.screen.draw(step);
+
+		this.$el.find('#keyboard').html('Keyboard: ' + Bifrost.Keyboard.getKeysDown());
+		this.$el.find('#gamepad').html(Bifrost.Gamepad.isConnected() ? 'Gamepad: ' + Bifrost.Keyboard.getKeysDown() : 'Gamepad not connected');
+		this.$el.find('#mouse').html('Mouse: ' + Bifrost.Mouse.getKeysDown() + '; x: ' + Bifrost.Mouse.x + ', y: '  + Bifrost.Mouse.y);
 	};
 	MainComponent.prototype.postRender = function() {
 
