@@ -36,9 +36,9 @@ define([
       this.connected = true;
 
       var axes = pad.axes;
-      this.updatedAnalogStick(axes, 'LEFT');
-      this.updatedAnalogStick(axes, 'RIGHT');
-      this.updatedButtons(pad.buttons);
+      this.updateAnalogStick(axes, 'LEFT');
+      this.updateAnalogStick(axes, 'RIGHT');
+      this.updateButtons(pad.buttons);
     } else {
       this.connected = false;
     }
@@ -67,17 +67,19 @@ define([
     }
   };
 
-  Gamepad.prototype.updatedButtons = function(buttons) {
+  Gamepad.prototype.updateButtons = function(buttons) {
     var t = performance.now();
 
-    var b;
+    var index, button;
     for (var btn in BUTTONS) {
       if (!BUTTONS.hasOwnProperty(btn)) {
         continue;
       }
 
-      b = BUTTONS[btn];
-      this.pressedDuration[btn] = buttons[b] > 0.0 ? t : 0.0;
+      index = BUTTONS[btn];
+      button = buttons[index];
+
+      this.pressedKeyDuration[btn] = (button.pressed || button.value > 0.0) ? t : 0.0;
     }
   };
 

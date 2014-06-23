@@ -58,6 +58,10 @@ define([
 			window.setTimeout(Bifrost.$.proxy(this.update, this), 33);
 		}
 
+		Bifrost.Keyboard.update();
+		Bifrost.Gamepad.update();
+		Bifrost.Mouse.update();
+
 		var old = this.time;
 
 		var current = new Date().getTime();
@@ -68,9 +72,9 @@ define([
 
 		this.components.screen.draw(step);
 
-		this.$el.find('#keyboard').html('Keyboard: ' + Bifrost.Keyboard.getKeysDown());
-		this.$el.find('#gamepad').html(Bifrost.Gamepad.isConnected() ? 'Gamepad: ' + Bifrost.Keyboard.getKeysDown() : 'Gamepad not connected');
-		this.$el.find('#mouse').html('Mouse: ' + Bifrost.Mouse.getKeysDown() + '; x: ' + Bifrost.Mouse.x + ', y: '  + Bifrost.Mouse.y);
+		this.$el.find('#keyboard').html('Keyboard: ' + Bifrost.Keyboard.getKeysDown().join(', '));
+		this.$el.find('#gamepad').html(Bifrost.Gamepad.isConnected() ? 'Gamepad: ' + Bifrost.Gamepad.getKeysDown().join(', ') + '; left: ' + Bifrost.Gamepad.getLeftStick() + ', right: ' + Bifrost.Gamepad.getRightStick() : 'Gamepad not connected');
+		this.$el.find('#mouse').html('Mouse: ' + Bifrost.Mouse.getKeysDown().join(', ') + '; x: ' + Bifrost.Mouse.x + ', y: '  + Bifrost.Mouse.y);
 	};
 	MainComponent.prototype.postRender = function() {
 
