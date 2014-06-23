@@ -1,62 +1,37 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('static-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
+var express = require('express.io');
 var app = express();
+app.http().io();
+app.use(express.static('./public'));
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 
-app.use(require('connect-livereload')({
-	port: 35729
-}));
-app.use(favicon());
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', routes);
-app.use('/users', users);
-
-/// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-	var err = new Error('Not Found');
-	err.status = 404;
-	next(err);
+var GameLoop = require('./GameLoop');
+var gameLoop = new GameLoop({
+	sendGameState: function(state) {
+		app.io.room('monitor').broadcast('monitor:game-state', state);
+	}
 });
 
-/// error handlers
+gameLoop.start();
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-	app.use(function(err, req, res, next) {
-		res.status(err.status || 500);
-		res.render('error', {
-			message: err.message,
-			error: err
-		});
-	});
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-	res.status(err.status || 500);
-	res.render('error', {
-		message: err.message,
-		error: {}
-	});
+app.io.route('monitor', {
+	connect: function(req) {
+		req.io.join('monitor');
+	}
 });
 
+app.io.route('controller', {
+	connect: function(req) {
+		console.log(req.data.name);
+		gameLoop.addPlayer(req.socket.id, req.data);
+	},
+	input: function(req) {
+		gameLoop.userInput(req.socket.id, req.data);
+	},
+	disconnect: function(req) {
+		gameLoop.removePlayer(req.socket.id);
+	}
+});
 
-module.exports = app;
+var port = 3000;
+app.listen(port);
+console.log("Server started on port " + port);
