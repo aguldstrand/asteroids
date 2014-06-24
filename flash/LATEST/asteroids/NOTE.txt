@@ -1,0 +1,2 @@
+asteroids flash controller and asteroids flash server can NOT be run on the same machine.
+this will cause port conflicts.

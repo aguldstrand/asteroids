@@ -60,17 +60,17 @@ define(['Bifrost'], function(Bifrost) {
 		this.gl = gl;
 
 		// setup GLSL program
-		var vertexShader = createShaderFromScriptElement(gl, "2d-vertex-shader");
-		var fragmentShader = createShaderFromScriptElement(gl, "2d-fragment-shader");
-		window.program = createProgram(gl, [vertexShader, fragmentShader]);
-		gl.useProgram(program);
+		var vertexShader = window.createShaderFromScriptElement(gl, "2d-vertex-shader");
+		var fragmentShader = window.createShaderFromScriptElement(gl, "2d-fragment-shader");
+		window.program = window.createProgram(gl, [vertexShader, fragmentShader]);
+		gl.useProgram(window.program);
 
 		// look up where the vertex data needs to go.
-		var positionLocation = gl.getAttribLocation(program, "a_position");
+		var positionLocation = gl.getAttribLocation(window.program, "a_position");
 
 		// lookup uniforms
-		var resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-		var colorLocation = gl.getUniformLocation(program, "u_color");
+		var resolutionLocation = gl.getUniformLocation(window.program, "u_resolution");
+		var colorLocation = gl.getUniformLocation(window.program, "u_color");
 
 		// set the resolution
 		gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
@@ -92,7 +92,7 @@ define(['Bifrost'], function(Bifrost) {
 		polys = [];
 		gl.uniform4f(colorLocation, 0, 0, 0, 1);
 		polysAdded = this.addPolys(0, 0, this.SW * pixel, this.SH * pixel, polys);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(polys), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new window.Float32Array(polys), gl.STATIC_DRAW);
 		gl.drawArrays(gl.TRIANGLES, 0, polysAdded);
 
 
@@ -121,7 +121,15 @@ define(['Bifrost'], function(Bifrost) {
 		}
 
 		gl.uniform4f(colorLocation, 255, 255, 255, 1);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(polys), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new window.Float32Array(polys), gl.STATIC_DRAW);
+		gl.drawArrays(gl.TRIANGLES, 0, numPolys);
+
+
+
+		polys = [];
+		numPolys = this.drawExplosions(polys);
+		gl.uniform4f(colorLocation, 255, 255, 255, 1);
+		gl.bufferData(gl.ARRAY_BUFFER, new window.Float32Array(polys), gl.STATIC_DRAW);
 		gl.drawArrays(gl.TRIANGLES, 0, numPolys);
 
 
@@ -133,10 +141,56 @@ define(['Bifrost'], function(Bifrost) {
 
 
 		gl.uniform4f(colorLocation, 1, 0, 0, 1);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(polys), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new window.Float32Array(polys), gl.STATIC_DRAW);
 		gl.drawArrays(gl.TRIANGLES, 0, numStatPolys);
 
 
+
+	};
+
+
+	ScreenComponent.prototype.drawExplosions = function(polys) {
+		var numPolys = 0;
+		var pixel = this.pixel;
+		var piOver180 = Math.PI / 180;
+		var explosions = [{
+			size: 50,
+			pos: {
+				x: 100,
+				y: 100
+			}
+		}, {
+			size: 250,
+			pos: {
+				x: 400,
+				y: 400
+			}
+		}];
+
+		for (var i = 0; i < explosions.length; i++) {
+			var explosion = explosions[i];
+			var explosionSize = explosion.size;
+
+
+
+			for (var e = 0; e < explosionSize; e++) {
+				var radius = Math.random() * 360;
+				var randSize = Math.random() * explosionSize * 0.3;
+				var posX = (Math.sin(radius * piOver180) * randSize) + explosion.pos.x;
+				var posY = (Math.cos(radius * piOver180) * randSize) + explosion.pos.y;
+
+				numPolys += this.addPolys(posX, posY, pixel, pixel, polys);
+
+
+				if (explosionSize > 150) {
+					numPolys += this.addPolys(posX + 1, posY, pixel, pixel, polys);
+					numPolys += this.addPolys(posX, posY + 1, pixel, pixel, polys);
+					numPolys += this.addPolys(posX + 1, posY + 1, pixel, pixel, polys);
+				}
+			}
+		}
+
+		return numPolys;
 
 	};
 
