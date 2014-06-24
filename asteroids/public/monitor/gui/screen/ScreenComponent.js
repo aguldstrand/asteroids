@@ -20,6 +20,7 @@ define(['Bifrost'], function(Bifrost) {
 			this.BL = 2;
 			this.BR = 3;
 			this.TR = 4;
+			this.pixelPoints = [];
 			this.___starMap = [];
 		}
 	}
@@ -117,7 +118,7 @@ define(['Bifrost'], function(Bifrost) {
 
 		for (var i = 0; i < this.SH; i++) {
 
-			numPolys += this.addPolys(this.___starMap[i], i, pixel, pixel, polys);
+			numPolys += this.addPolys(this.___starMap[i], i, pixel, pixel, polys, false, this.TL);
 		}
 
 		gl.uniform4f(colorLocation, 255, 255, 255, 1);
@@ -127,8 +128,8 @@ define(['Bifrost'], function(Bifrost) {
 
 
 		polys = [];
-		numPolys = this.drawExplosions(polys);
-		gl.uniform4f(colorLocation, 255, 255, 255, 1);
+		numPolys = this.drawBigExplosions(polys);
+		gl.uniform4f(colorLocation, 255, 0, 0, 1);
 		gl.bufferData(gl.ARRAY_BUFFER, new window.Float32Array(polys), gl.STATIC_DRAW);
 		gl.drawArrays(gl.TRIANGLES, 0, numPolys);
 
@@ -192,6 +193,113 @@ define(['Bifrost'], function(Bifrost) {
 
 		return numPolys;
 
+	};
+
+	ScreenComponent.prototype.drawBigExplosions = function(polys) {
+		var numPolys = 0;
+		var pixel = this.pixel;
+		var piOver180 = Math.PI / 180;
+		var pp = {
+			p: {}
+		};
+		var explosions = [];
+		//if (Math.random() > 0.5) {
+
+		explosions = [{
+			size: Math.random() * 250,
+			pos: {
+				x: 400,
+				y: 400
+			}
+		}];
+		//}
+
+		var ppCnt = 0;
+		for (var i = 0; i < explosions.length; i++) {
+			var explosion = explosions[i];
+			var explosionSize = explosion.size;
+
+			//audioManager.addSound(AudioManager.TYPE_EXPLOSION, explosion.pos, explosion.size);
+
+			for (var e = 0; e < explosionSize; e++) {
+
+				var radi = Math.random() * explosionSize;
+				var radius = Math.random() * 360;
+
+				for (var r = 0; r < radi; r += 6) {
+
+					var randSize = r;
+					var posX = (Math.sin(radius * piOver180) * randSize) + explosion.pos.x;
+					var posY = (Math.cos(radius * piOver180) * randSize) + explosion.pos.y;
+
+					numPolys += this.addPolys(posX, posY, pixel, pixel, polys, false, this.TL);
+					ppCnt++;
+
+					if (explosionSize > 150) {
+						numPolys += this.addPolys(posX + 1, posY, pixel, pixel, polys, false, this.TL);
+						numPolys += this.addPolys(posX, posY + 1, pixel, pixel, polys, false, this.TL);
+						numPolys += this.addPolys(posX + 1, posY + 1, pixel, pixel, polys, false, this.TL);
+
+
+						if (ppCnt > 1) {
+							ppCnt = 0;
+							if (this.pixelPoints.length < 4000) {
+								pp = {
+									p: {}
+								};
+								//pp.color = 0xFFFFFF;
+								pp.p.x = posX;
+								pp.p.y = posY;
+								pp.life = Math.random() * 100 + 20;
+								pp.drift = Math.random() * 10 - 5;
+								pp.fall = Math.random() * 3 + 2;
+								this.pixelPoints.push(pp);
+							}
+						}
+					}
+				}
+
+			}
+		}
+
+
+		/*if (numExplosions > 0) {
+			GAME_BMP.x = Math.random() > .5 ? numExplosions : -numExplosions;
+			GAME_BMP.y = Math.random() > .5 ? numExplosions : -numExplosions;
+		} else {
+			GAME_BMP.x = 0;
+			GAME_BMP.y = 0;
+		}*/
+
+		var ppLen = this.pixelPoints.length;
+
+
+
+		for (var p = 0; p < ppLen; p++) {
+
+			pp = this.pixelPoints[p];
+			pp.p.y += pp.fall;
+			pp.p.x += pp.drift;
+
+			pp.life--;
+
+			if (pp.drift < 0) {
+				pp.drift++;
+			} else if (pp.drift > 0) {
+				pp.drift--;
+			}
+
+			//pp.color -= .00001;
+			numPolys += this.addPolys(pp.p.x, pp.p.y, pixel, pixel, polys, false, this.TL);
+
+
+			if (pp.life < 0 || pp.p.y > this.SH) {
+				ppLen--;
+				this.pixelPoints.splice(p, 1);
+			}
+		}
+
+		return numPolys;
 	};
 
 
