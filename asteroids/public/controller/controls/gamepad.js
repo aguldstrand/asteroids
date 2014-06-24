@@ -8,7 +8,7 @@ define([
   Controls
 ) {
 
-  function Gamepad(){
+  function Gamepad() {
     // vars
     this.lastButtonState = [];
     this.lastAxesState = [];
@@ -30,7 +30,7 @@ define([
   Gamepad.prototype.update = function() {
     Controls.prototype.update.call(this); // super
 
-    var pad = (window.navigator.getGamepads() || {})[0];
+    var pad = (window.navigator.getGamepads ? window.navigator.getGamepads() : {})[0];
 
     if (pad) {
       this.connected = true;
@@ -46,7 +46,7 @@ define([
 
   Gamepad.prototype.updateAnalogStick = function(axes, side) {
     var abs = Math.abs,
-        epsilon = this.epsilon;
+      epsilon = this.epsilon;
 
     var x = axes[AXES[side + '_ANALOGUE_HOR']];
     var y = axes[AXES[side + '_ANALOGUE_VERT']];
@@ -60,7 +60,7 @@ define([
 
     if (side === 'LEFT') {
       this.leftStickX = x;
-      this.leftStickY = y;  
+      this.leftStickY = y;
     } else {
       this.rightStickX = x;
       this.rightStickY = y;
