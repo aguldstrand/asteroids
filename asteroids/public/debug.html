@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
+	<title>ASTEROIDS</title>	
+	
+	<!-- Temp Styles -->
+	<style type="text/css" media="screen">
+		html,
+		body {
+			margin: 0;
+		}
+	
+		body {
+			padding: 0px 0 0
+		}
+	</style>
+</head>
+<body>
+	<script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        var io = io.connect();
+
+        // monitor
+        io.emit('monitor:connect');
+        io.on('monitor:game-state', function(state) {
+            // update playing field
+            output.innerText = JSON.stringify(state, null, 2, null);
+        });
+
+        // controller
+        io.emit('controller:connect', {
+            name: 'apap'
+            // etc from spec
+        });
+        io.emit('controller:input', [1, 0, 1, 0, 1, 1, 1]);
+
+
+    </script>
+
+	<pre id="output"></pre>
+
+</body>
+</html>

@@ -10,7 +10,7 @@ var GameModel = require('./GameModel');
 var gameLoop = new GameLoop({
 	gameModel: new GameModel(),
 	sendGameState: function(state) {
-		app.io.room('monitor').broadcast('monitor:game-state', state);
+		app.io.broadcast('monitor:game-state', state);
 	}
 });
 

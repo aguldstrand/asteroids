@@ -4,10 +4,11 @@ var TriangleCheck = require('./TriangleCheck')
 var Asteroid = require('./Asteroid')
 
 function GameLoop(options) {
+	this.gameModel = options.gameModel;
 	this.sendGameState = options.sendGameState;
+
 	this.running = false;
 
-	this.gameModel = options.gameModel;
 
 	this.frameCounter = 0;
 
@@ -619,6 +620,7 @@ GameLoop.prototype.createExplosion = function(size /*int*/ , pos /*Point*/ ) {
 GameLoop.prototype.start = function() {
 	this.running = true;
 	this.lastStep = process.hrtime();
+
 	setTimeout(this.step.bind(this));
 };
 
@@ -630,6 +632,8 @@ GameLoop.prototype.step = function() {
 
 		var step = parseInt((diff[0] * 1e9 + diff[1]) / 1000, 10);
 		this.update(step);
+
+		this.sendGameState(this.gameModel);
 
 		// setTimeout should have good enough resolution for a game loop
 		// and wont hammer the cpu the same way as setImmediate
