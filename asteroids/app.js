@@ -5,7 +5,10 @@ app.use(express.static('./public'));
 
 
 var GameLoop = require('./GameLoop');
+var GameModel = require('./GameModel');
+
 var gameLoop = new GameLoop({
+	gameModel: new GameModel(),
 	sendGameState: function(state) {
 		app.io.room('monitor').broadcast('monitor:game-state', state);
 	}
@@ -15,19 +18,24 @@ gameLoop.start();
 
 app.io.route('monitor', {
 	connect: function(req) {
+		console.log('Monitor connected - ' + req.socket.id);
 		req.io.join('monitor');
+	},
+	disconnect: function(req) {
+		console.log('Monitor disconnected - ' + req.socket.id);
 	}
 });
 
 app.io.route('controller', {
 	connect: function(req) {
-		console.log(req.data.name);
+		console.log('Controller connected - ' + req.socket.id + ':' + req.data.name);
 		gameLoop.addPlayer(req.socket.id, req.data);
 	},
 	input: function(req) {
 		gameLoop.userInput(req.socket.id, req.data);
 	},
 	disconnect: function(req) {
+		console.log('Controller disconnected - ' + req.socket.id + ':' + req.data.name);
 		gameLoop.removePlayer(req.socket.id);
 	}
 });

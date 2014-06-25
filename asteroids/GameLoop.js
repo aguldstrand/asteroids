@@ -1,12 +1,15 @@
 var Point = require('./Point')
 var Matrix = require('./Matrix')
 var TriangleCheck = require('./TriangleCheck')
+var Asteroid = require('./Asteroid')
 
 function GameLoop(options) {
 	this.sendGameState = options.sendGameState;
 	this.running = false;
 
 	this.gameModel = options.gameModel;
+
+	this.frameCounter = 0;
 
 	this.c = null; //:Counter;
 	this.SW = 0; //:int;
@@ -34,12 +37,17 @@ function GameLoop(options) {
 
 	this.gravityRes = null; //: int;
 	this.gravityDebug = null; //: Array;
+
+	this.init();
 }
 
 GameLoop.prototype.init = function() {
-	this.c = new Counter();
+	this.fpsLastTime = process.hrtime();
+
 	this.SW = this.gameModel.SW;
 	this.SH = this.gameModel.SH;
+
+	console.log("model", this.gameModel);
 
 	this.collideFlags = [];
 
@@ -47,12 +55,12 @@ GameLoop.prototype.init = function() {
 	this.RwingP = new Point(-20, 20);
 	this.noseP = new Point(40, 0);
 
-	this.shiplLayout = [LwingP, RwingP, noseP];
+	this.shiplLayout = [this.LwingP, this.RwingP, this.noseP];
 
 	this.gravityDebug = [];
 	this.gravityRes = 25;
-	var gLen = parseInt(SW / gravityRes, 10) * parseInt(SH / gravityRes, 10);
-	this.gravity = [];
+	var gLen = parseInt(this.SW / this.gravityRes, 10) * parseInt(this.SH / this.gravityRes, 10);
+	var gravity = this.gravity = [];
 	for (var i = 0; i < gLen; i++) {
 		gravity[i] = new Point();
 	}
@@ -65,6 +73,14 @@ GameLoop.prototype.degreesToRadians = function(degrees) {
 GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
 	this.frameCounter++;
+	if (this.frameCounter % 100 === 0) {
+
+		var diff = process.hrtime(this.fpsLastTime);
+		this.fpsLastTime = process.hrtime();
+		var step = (100 / ((diff[0] * 1e9 + diff[1]) / 1e9)) | 0;
+
+		console.log('fps: ' + step);
+	}
 
 	var numExplosions = this.gameModel.explosions.length;
 	var numShips = this.gameModel.ships.length;
@@ -74,8 +90,8 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
 	//var test:int = Math.min(numAsteroids, 1);
 	var numBulletsInShip;
-	for (var y = 0; y < parseInt(SH / gravityRes, 10); y++) {
-		for (var x = 0; x < parseInt(SW / gravityRes, 10); x++) {
+	for (var y = 0; y < parseInt(this.SH / this.gravityRes, 10); y++) {
+		for (var x = 0; x < parseInt(this.SW / this.gravityRes, 10); x++) {
 			var xgra = 0;
 			var ygra = 0;
 
@@ -102,8 +118,8 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 				ygra += _____y;
 			}
 
-			gravity[int(x + y * SW / gravityRes)].x = xgra;
-			gravity[int(x + y * SW / gravityRes)].y = ygra;
+			this.gravity[parseInt(x + y * this.SW / this.gravityRes, 10)].x = xgra;
+			this.gravity[parseInt(x + y * this.SW / this.gravityRes, 10)].y = ygra;
 			//trace(int(x + y * SW / gravityRes));
 		}
 
@@ -246,18 +262,15 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 	for (var a = 0; a < numAsteroids; a++) {
 		var asteroid = this.gameModel.asteroids[a];
 
-
-
-		asteroid.pos.x %= SW;
-		asteroid.pos.y %= SH;
+		asteroid.pos.x %= this.SW;
+		asteroid.pos.y %= this.SH;
 
 		if (asteroid.pos.x < 0) {
-			asteroid.pos.x = SW - 1;
+			asteroid.pos.x = this.SW - 1;
 		}
 		if (asteroid.pos.y < 0) {
-			asteroid.pos.y = SH - 1;
+			asteroid.pos.y = this.SH - 1;
 		}
-
 
 		//var ag:Point = getGravity(asteroid.pos);
 		//asteroid.vel.x += ag.x;
@@ -360,7 +373,7 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
 
 	//SHIP ON SHIP COLLISION
-	if (frameCounter % 25 == 0) {
+	if (this.frameCounter % 25 == 0) {
 		//Tracker.track(" clearing collide flags ");
 		collideFlags = new Array();
 	}
@@ -492,7 +505,7 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 		}
 	}
 	if (numAsteroids < 1) {
-		createAsteroids();
+		this.createAsteroids();
 	}
 }
 
@@ -525,12 +538,12 @@ GameLoop.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Poin
 
 GameLoop.prototype.getGravity = function(pos /*Point*/ ) {
 
-	var _x = parseInt(pos.x, 10) / gravityRes;
-	var _y = parseInt(pos.y, 10) / gravityRes;
+	var _x = parseInt(parseInt(pos.x, 10) / this.gravityRes, 10);
+	var _y = parseInt(parseInt(pos.y, 10) / this.gravityRes, 10);
 
-	var gravW = this.SW / gravityRes;
+	var gravW = parseInt(this.SW / this.gravityRes, 10);
 
-	var index = _y * gravW + _x;
+	var index = parseInt(_y * gravW + _x, 10);
 
 	//trace("point x  : " + pos.x);
 	//trace("point y  : " + pos.y);
@@ -540,7 +553,8 @@ GameLoop.prototype.getGravity = function(pos /*Point*/ ) {
 	//trace("index: " + index);
 
 
-	var grav = gravity[index];
+	var grav = this.gravity[index];
+
 	return grav;
 }
 
@@ -550,7 +564,7 @@ GameLoop.prototype.createAsteroids = function() {
 		asteroid.diam = Math.random() * 20 + 20;
 		asteroid.friction = 0;
 		asteroid.maxVel = 20;
-		asteroid.pos = Math.random() > .5 ? new Point(0, Math.random() * SH) : new Point(Math.random() * SW, 0);
+		asteroid.pos = Math.random() > .5 ? new Point(0, Math.random() * this.SH) : new Point(Math.random() * this.SW, 0);
 		asteroid.vel = Math.random() > .5 ? new Point(Math.random() * 5 + 5, Math.random() * 5 + 5) : new Point(Math.random() * -5 - 5, Math.random() * -5 - 5);
 
 		this.gameModel.asteroids.push(asteroid);
@@ -604,11 +618,19 @@ GameLoop.prototype.createExplosion = function(size /*int*/ , pos /*Point*/ ) {
 
 GameLoop.prototype.start = function() {
 	this.running = true;
+	this.lastStep = process.hrtime();
 	setTimeout(this.step.bind(this));
 };
 
 GameLoop.prototype.step = function() {
 	if (this.running) {
+		// Will cause a slight drift but shoud be good enough
+		var diff = process.hrtime(this.lastStep);
+		this.lastStep = process.hrtime();
+
+		var step = parseInt((diff[0] * 1e9 + diff[1]) / 1000, 10);
+		this.update(step);
+
 		// setTimeout should have good enough resolution for a game loop
 		// and wont hammer the cpu the same way as setImmediate
 		setTimeout(this.step.bind(this));
