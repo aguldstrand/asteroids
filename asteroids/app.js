@@ -32,10 +32,11 @@ app.io.route('controller', {
 		gameLoop.addPlayer(req.socket.id, req.data);
 	},
 	input: function(req) {
+		// console.log('user input - ' + req.socket.id + ':' + req.data);
 		gameLoop.userInput(req.socket.id, req.data);
 	},
 	disconnect: function(req) {
-		console.log('Controller disconnected - ' + req.socket.id + ':' + req.data.name);
+		console.log('Controller disconnected - ' + req.socket.id);
 		gameLoop.removePlayer(req.socket.id);
 	}
 });

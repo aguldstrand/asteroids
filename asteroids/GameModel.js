@@ -1,5 +1,4 @@
 function GameModel() {
-	this.monitors = [];
 	this.userInputs = {};
 
 	this.ships = [];
@@ -7,8 +6,8 @@ function GameModel() {
 	this.asteroids = [];
 	this.explosions = [];
 
-	this.SW = 1200;
-	this.SH = 800;
+	this.SW = 10000;
+	this.SH = 10000;
 }
 
 module.exports = GameModel;

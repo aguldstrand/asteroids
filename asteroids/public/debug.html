@@ -35,7 +35,16 @@
             name: 'apap'
             // etc from spec
         });
-        io.emit('controller:input', [1, 0, 1, 0, 1, 1, 1]);
+
+        setInterval(function() {
+
+        	var input = [];
+        	for(var i = 0; i < 8; i++) {
+        		input.push(parseInt(Math.random() + 0.5, 10));
+        	}
+
+        	io.emit('controller:input', input);
+        }, 200);
 
 
     </script>
