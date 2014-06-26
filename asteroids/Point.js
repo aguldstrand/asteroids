@@ -7,11 +7,11 @@ Point.prototype.clone = function() {
 	return new Point(this.x, this.y);
 };
 
-Point.prototype.normalize = function(len) {
+Point.prototype.length = function() {
+	return Math.sqrt(this.x * this.x + this.y * this.y);
+};
 
-	if (len === 0) {
-		throw "ERROR";
-	}
+Point.prototype.normalize = function(len) {
 
 	var mag = Math.sqrt(this.x * this.x + this.y * this.y);
 

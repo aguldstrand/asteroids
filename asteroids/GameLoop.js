@@ -521,11 +521,13 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 GameLoop.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ , secs /*Number*/ ) {
 
 	var g = this.getGravity(obj.pos);
+	console.log(obj.pos, g);
+
 	obj.acc.x = g.x + acc.x;
 	obj.acc.y = g.y + acc.y;
 
 
-	if (obj.vel.length > 0.1) {
+	if (obj.vel.length() > 0.1) {
 		var frictionP = new Point(-obj.vel.x, -obj.vel.y);
 		frictionP.normalize(obj.friction);
 		obj.acc.x += frictionP.x;
@@ -535,7 +537,7 @@ GameLoop.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Poin
 	obj.vel.x += obj.acc.x * secs;
 	obj.vel.y += obj.acc.y * secs;
 
-	if (obj.vel.length > obj.maxVel) {
+	if (obj.vel.length() > obj.maxVel) {
 		obj.vel.normalize(obj.maxVel);
 	}
 
@@ -563,10 +565,6 @@ GameLoop.prototype.getGravity = function(pos /*Point*/ ) {
 
 
 	var grav = this.gravity[index];
-
-	if (!grav) {
-		console.log(pos, grav);
-	}
 
 	return grav;
 }
