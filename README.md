@@ -1,5 +1,8 @@
 # Asteroids
 
+## Tips
+* Use nodemon to auto reload the server in development
+
 ## TODO
 
 ### Monitor
