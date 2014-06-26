@@ -4,7 +4,7 @@
 		catchError: {
 			define: false
 		},
-		baseUrl: '../public',
+		baseUrl: '.',
 
 		packages: [{
 			name: 'Bifrost',

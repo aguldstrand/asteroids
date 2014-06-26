@@ -23,6 +23,12 @@ define([
 			Bifrost.Keyboard = new Keyboard();
 			Bifrost.Gamepad = new Gamepad();
 			Bifrost.Mouse = new Mouse();
+
+			var that = this;
+			window.io.emit('monitor:connect');
+			window.io.on('monitor:game-state', function(state) {
+				that.gameState = state;
+			});
 		}
 	}
 
@@ -69,8 +75,10 @@ define([
 		var step = current - old;
 
 		this.time = current;
+		if (this.gameState) {
+			this.components.screen.update(step, this.gameState);
+		}
 
-		this.components.screen.update(step);
 
 		this.$el.find('#keyboard').html('Keyboard: ' + Bifrost.Keyboard.getKeysDown().join(', '));
 		this.$el.find('#gamepad').html(Bifrost.Gamepad.isConnected() ? 'Gamepad: ' + Bifrost.Gamepad.getKeysDown().join(', ') + '; left: ' + Bifrost.Gamepad.getLeftStick() + ', right: ' + Bifrost.Gamepad.getRightStick() : 'Gamepad not connected');

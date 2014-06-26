@@ -143,7 +143,7 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 	var pb;
 	var pc;
 
-	var secs = step / 1000;
+	var secs = step / 1000000;
 
 
 	for (var e = 0; e < numExplosions; e++) {

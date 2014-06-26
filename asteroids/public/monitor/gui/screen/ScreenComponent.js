@@ -3,6 +3,7 @@ define([
 	'monitor/gui/objects/Poly',
 	'monitor/gui/objects/Starmap',
 	'monitor/gui/objects/Ships',
+	'monitor/gui/objects/Asteroids',
 
 	'monitor/gui/objects/Explosions'
 ], function(
@@ -10,6 +11,7 @@ define([
 	Poly,
 	Starmap,
 	Ships,
+	Asteroids,
 	Explosions) {
 
 	function ScreenComponent(options) {
@@ -34,6 +36,7 @@ define([
 		this.starmap = new Starmap(this.pixel, this.SW, this.SH);
 		this.explosions = new Explosions(this.pixel, this.SW, this.SH);
 		this.ships = new Ships(this.pixel, this.SW, this.SH);
+		this.asteroids = new Asteroids(this.pixel, this.SW, this.SH);
 	};
 
 
@@ -74,7 +77,7 @@ define([
 
 
 
-	ScreenComponent.prototype.update = function(step) {
+	ScreenComponent.prototype.update = function(step, gameState) {
 
 
 		var polys = [];
@@ -99,6 +102,11 @@ define([
 		polys = [];
 		numPolys = this.ships.update(step, polys);
 		this.draw(polys, numPolys, 0, 1, 0, 1);
+
+		//Asteroids
+		polys = [];
+		numPolys = this.asteroids.update(step, polys, gameState.asteroids);
+		this.draw(polys, numPolys, 0.5, 0.5, 0.5, 1);
 
 
 
@@ -129,8 +137,8 @@ define([
 
 		var canvas = this.$el.find('canvas')[0];
 
-		canvas.width = 800 - 20;
-		canvas.height = 800 - 40;
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
 
 		//this.pixel = (canvas.width + canvas.height) * 0.0025;
 
