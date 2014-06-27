@@ -34,7 +34,7 @@ define([
 
 	App.prototype.getModels = function() {
 		return [];
-
+		f
 		/*return [{
 			name: 'navigation',
 			type: NavigationModel,

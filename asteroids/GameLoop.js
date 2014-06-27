@@ -61,7 +61,7 @@ GameLoop.prototype.init = function() {
 	this.shipLayout = [this.LwingP, this.RwingP, this.noseP];
 
 	this.gravityDebug = [];
-	this.gravityRes = 25;
+	this.gravityRes = 3;
 	var gLen = parseInt(this.SW / this.gravityRes, 10) * parseInt(this.SH / this.gravityRes, 10);
 	var gravity = this.gravity = [];
 	for (var i = 0; i < gLen; i++) {
@@ -568,7 +568,6 @@ GameLoop.prototype.getGravity = function(pos /*Point*/ ) {
 
 	return grav;
 }
-
 GameLoop.prototype.createAsteroids = function() {
 	for (var i = 0; i < 100; i++) {
 		var asteroid = new Asteroid();

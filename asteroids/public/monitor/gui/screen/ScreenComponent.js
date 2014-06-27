@@ -95,12 +95,12 @@ define([
 
 		//EXPLOSIONS
 		polys = [];
-		numPolys = this.explosions.update(step, polys);
+		numPolys = this.explosions.update(step, polys, gameState.explosions);
 		this.draw(polys, numPolys, 1, 1, 0, 1);
 
 		//SHIPS
 		polys = [];
-		numPolys = this.ships.update(step, polys);
+		numPolys = this.ships.update(step, polys, gameState.ships);
 		this.draw(polys, numPolys, 0, 1, 0, 1);
 
 		//Asteroids

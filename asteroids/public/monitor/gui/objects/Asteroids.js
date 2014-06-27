@@ -33,9 +33,9 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 
 
 
-				var ap = this.rotate_point(this.p, j * 45 - 45);
+				var ap = this.rotate_point(this.p, (j * 45 - 45) + asteroid.rot);
 
-				var rp = this.rotate_point(this.p, j * 45);
+				var rp = this.rotate_point(this.p, (j * 45) + asteroid.rot);
 				//ap.x = ap.x + Math.random() * asteroid.diam;
 				//rp.x = rp.x + Math.random() * asteroid.diam;
 

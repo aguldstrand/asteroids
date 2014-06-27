@@ -88,7 +88,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		};
 	};
 
-	Ships.prototype.update = function(step, polys) {
+	Ships.prototype.update = function(step, polys, ships) {
 
 		var numPolys = 0;
 
@@ -97,41 +97,54 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		this.ds_rotation -= 1.5;
 		this.dp_rotation -= 0.5;
 
-		var ships = [{
-			rotation: this.d_rotation,
-			x: 300,
-			y: 300,
-			scale: 1,
-			shieldHealth: [10, 10, 10, 2, 10, 10, 10, 4]
-		}, {
-			rotation: this.d_rotation,
-			x: 600,
-			y: 300,
-			scale: 1,
-			shieldHealth: [5, 0, 0, 2, 5, 5, 7, 1]
-		}];
+
+		/*
+		{
+      "id": "y6vkaWVMX3W0nwyJYLWo",
+      "name": "apap",
+      "color": "FF0000",
+      "rot": 0,
+      "bullets": [],
+      "score": 0,
+      "spawnTimer": -1,
+      "friction": 25,
+      "maxVel": 200,
+      "pos": {
+        "x": 0,
+        "y": 0
+      },
+      "vel": {
+        "x": 0,
+        "y": 0
+      },
+      "acc": {
+        "x": 0,
+        "y": 0
+      }
+    }*/
 
 		var len = ships.length;
 		for (var i = 0; i < len; i++) {
 			var ship = ships[i];
 
+			window.tracker.outFixed('ship' + i, ship.pos.x + ':' + ship.pos.y);
 
 			//SHIP
-			var Lwing = this.rotate_point(this.LwingP, ship.rotation);
-			var Lwingi = this.rotate_point(this.LwingPi, ship.rotation);
-			var Rwing = this.rotate_point(this.RwingP, ship.rotation);
-			var Rwingi = this.rotate_point(this.RwingPi, ship.rotation);
-			var Nose = this.rotate_point(this.noseP, ship.rotation);
-			var Rear = this.rotate_point(this.rearP, ship.rotation);
-			var RearIR = this.rotate_point(this.rearIR, ship.rotation);
-			var RearIL = this.rotate_point(this.rearIL, ship.rotation);
+			var Lwing = this.rotate_point(this.LwingP, ship.rot);
+			var Lwingi = this.rotate_point(this.LwingPi, ship.rot);
+			var Rwing = this.rotate_point(this.RwingP, ship.rot);
+			var Rwingi = this.rotate_point(this.RwingPi, ship.rot);
+			var Nose = this.rotate_point(this.noseP, ship.rot);
+			var Rear = this.rotate_point(this.rearP, ship.rot);
+			var RearIR = this.rotate_point(this.rearIR, ship.rot);
+			var RearIL = this.rotate_point(this.rearIL, ship.rot);
 
 
-			numPolys += Poly.addR(ship.x, ship.y, Lwing.x, Lwing.y, Lwingi.x, Lwingi.y, Nose.x, Nose.y, polys, ship.scale);
-			numPolys += Poly.addR(ship.x, ship.y, Rwing.x, Rwing.y, Rwingi.x, Rwingi.y, Nose.x, Nose.y, polys, ship.scale);
-			numPolys += Poly.addR(ship.x, ship.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, Rear.x, Rear.y, polys, ship.scale);
-			numPolys += Poly.addR(ship.x, ship.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, polys, ship.scale);
-			numPolys += Poly.addR(ship.x, ship.y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, polys, ship.scale);
+			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Lwing.x, Lwing.y, Lwingi.x, Lwingi.y, Nose.x, Nose.y, polys, 1);
+			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Rwingi.x, Rwingi.y, Nose.x, Nose.y, polys, 1);
+			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, Rear.x, Rear.y, polys, 1);
+			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, polys, 1);
+			numPolys += Poly.addR(ship.pos.x, ship.pos.y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, polys, 1);
 
 			//FUCK
 
@@ -146,15 +159,15 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 					y: this.shieldA3.y
 				};
 				var rs3 = this.rotate_point(damageReflection, this.ds_rotation + j * 45);
-				numPolys += Poly.addR(ship.x, ship.y, rs1.x, rs1.y, rs2.x, rs2.y, rs3.x, rs3.y, polys, ship.scale);
+				numPolys += Poly.addR(ship.pos.x, ship.pos.y, rs1.x, rs1.y, rs2.x, rs2.y, rs3.x, rs3.y, polys, 1);
 			}
 
 			//DRONE
 			var droneP = this.rotate_point(this.droneP, this.dp_rotation);
-			var droneLW = this.rotate_point(this.droneLW, ship.rotation);
-			var droneRW = this.rotate_point(this.droneRW, ship.rotation);
-			var droneN = this.rotate_point(this.droneN, ship.rotation);
-			numPolys += Poly.addR(ship.x + droneP.x, ship.y + droneP.y, droneLW.x, droneLW.y, droneRW.x, droneRW.y, droneN.x, droneN.y, polys, ship.scale);
+			var droneLW = this.rotate_point(this.droneLW, ship.rot);
+			var droneRW = this.rotate_point(this.droneRW, ship.rot);
+			var droneN = this.rotate_point(this.droneN, ship.rot);
+			numPolys += Poly.addR(ship.pos.x + droneP.x, ship.pos.y + droneP.y, droneLW.x, droneLW.y, droneRW.x, droneRW.y, droneN.x, droneN.y, polys, 1);
 
 
 

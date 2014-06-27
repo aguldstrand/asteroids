@@ -8,7 +8,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 
 	}
 
-	Explosions.prototype.update = function(step, polys) {
+	Explosions.prototype.update = function(step, polys, explosions) {
 
 		var numPolys = 0;
 		var pixel = this.pixel;
@@ -16,18 +16,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		var pp = {
 			p: {}
 		};
-		var explosions = [];
-		if (Math.random() > 0.5) {
 
-			explosions = [{
-
-				size: Math.random() * 250,
-				pos: {
-					x: 400,
-					y: 400
-				}
-			}];
-		}
 
 		var ppCnt = 0;
 		for (var i = 0; i < explosions.length; i++) {

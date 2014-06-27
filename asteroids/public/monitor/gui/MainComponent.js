@@ -29,6 +29,12 @@ define([
 			window.io.on('monitor:game-state', function(state) {
 				that.gameState = state;
 			});
+
+			window.io.emit('controller:connect', {
+				name: 'apap'
+				// etc from spec
+			});
+
 		}
 	}
 
@@ -78,6 +84,17 @@ define([
 		if (this.gameState) {
 			this.components.screen.update(step, this.gameState);
 		}
+
+
+		var keys = {};
+		var pressed = Bifrost.Keyboard.getKeysDown();
+		var len = pressed.length;
+		for (var i = 0; i < len; i++) {
+			keys[pressed[i]] = true;
+		}
+
+		window.io.emit('controller:input', keys);
+
 
 
 		this.$el.find('#keyboard').html('Keyboard: ' + Bifrost.Keyboard.getKeysDown().join(', '));

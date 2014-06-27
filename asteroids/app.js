@@ -4,7 +4,7 @@ app.http().io();
 app.use(express.static('./public'));
 
 
-var GameLoop = require('./GameLoop');
+var GameLoop = require('./GameLoop2');
 var GameModel = require('./GameModel');
 
 var gameLoop = new GameLoop({
@@ -32,7 +32,7 @@ app.io.route('controller', {
 		gameLoop.addPlayer(req.socket.id, req.data);
 	},
 	input: function(req) {
-		// console.log('user input - ' + req.socket.id + ':' + req.data);
+		//console.log('user input - ' + req.socket.id + ':' + req.data);
 		gameLoop.userInput(req.socket.id, req.data);
 	},
 	disconnect: function(req) {
