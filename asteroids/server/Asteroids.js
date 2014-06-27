@@ -45,7 +45,7 @@ Asteroids.prototype.update = function(secs) {
 		//asteroid.vel.x += ag.x;
 		//asteroid.vel.y += ag.y;
 		//asteroid.vel.x = 10;
-		this.applyNewPositions(asteroid, asteroid.vel, secs);
+		this.applyNewPositions(asteroid, new Point(0, 0), secs);
 
 
 
@@ -82,7 +82,7 @@ Asteroids.prototype.createAsteroids = function(num) {
 		var asteroid = new Asteroid();
 		asteroid.diam = Math.random() * 20 + 20;
 		asteroid.friction = 0;
-		asteroid.maxVel = 20;
+		asteroid.maxVel = 200;
 		asteroid.pos = Math.random() > 0.5 ? new Point(Math.random() * this.SW, Math.random() * this.SH) : new Point(Math.random() * this.SW, Math.random() * this.SH);
 		asteroid.vel = Math.random() > 0.5 ? new Point(Math.random() * 5 + 5, Math.random() * 5 + 5) : new Point(Math.random() * -5 - 5, Math.random() * -5 - 5);
 

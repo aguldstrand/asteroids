@@ -51,13 +51,13 @@ GameLoop.prototype.init = function() {
 	this.shipLayout = [this.LwingP, this.RwingP, this.noseP];
 
 	this.gravityDebug = [];
-	this.gravityRes = 25;
+	this.gravityRes = 50;
 	var gLen = parseInt(this.SW / this.gravityRes, 10) * parseInt(this.SH / this.gravityRes, 10);
 	var gravity = this.gravity = [];
 	for (var i = 0; i < gLen; i++) {
 		gravity[i] = new Point();
 	}
-
+	this.gameModel.gravity = gravity;
 
 	var options = {
 		gm: this.gameModel,
@@ -96,7 +96,7 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
 
 	if (numAsteroids === 0) {
-		this.asteroids.createAsteroids(12);
+		this.asteroids.createAsteroids(32);
 	}
 
 

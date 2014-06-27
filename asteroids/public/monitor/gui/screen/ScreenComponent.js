@@ -4,6 +4,7 @@ define([
 	'monitor/gui/objects/Starmap',
 	'monitor/gui/objects/Ships',
 	'monitor/gui/objects/Asteroids',
+	'monitor/gui/objects/Debug',
 
 	'monitor/gui/objects/Explosions'
 ], function(
@@ -12,6 +13,7 @@ define([
 	Starmap,
 	Ships,
 	Asteroids,
+	Debug,
 	Explosions) {
 
 	function ScreenComponent(options) {
@@ -37,6 +39,7 @@ define([
 		this.explosions = new Explosions(this.pixel, this.SW, this.SH);
 		this.ships = new Ships(this.pixel, this.SW, this.SH);
 		this.asteroids = new Asteroids(this.pixel, this.SW, this.SH);
+		this.debug = new Debug(this.pixel, this.SW, this.SH);
 	};
 
 
@@ -91,7 +94,7 @@ define([
 		//STARMAP
 		polys = [];
 		numPolys = this.starmap.update(step, polys);
-		this.draw(polys, numPolys, 1, 1, 0, 1);
+		//this.draw(polys, numPolys, 1, 1, 0, 1);
 
 		//EXPLOSIONS
 		polys = [];
@@ -109,6 +112,11 @@ define([
 		this.draw(polys, numPolys, 0.5, 0.5, 0.5, 1);
 
 
+		//gravity - debug
+
+		polys = [];
+		numPolys = this.debug.update(step, polys, gameState.gravity);
+		this.draw(polys, numPolys, 1, 0, 0, 1);
 
 		//FPS BAR
 		polys = [];

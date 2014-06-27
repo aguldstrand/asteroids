@@ -97,7 +97,7 @@ Ships.prototype.update = function(secs) {
 		//var g:Point = gravity[int( int(ship.pos.x / gravityRes) + int(ship.pos.y / gravityRes) * int(SW / gravityRes))];				
 		//ship.vel.x += g.x;
 		//ship.vel.y += g.y;
-		this.applyNewPositions(ship, shipAcc, secs * 2);
+		this.applyNewPositions(ship, shipAcc, secs);
 
 		ship.diam = 40;
 		var len = this.gameModel.asteroids.length;
@@ -114,7 +114,7 @@ Ships.prototype.update = function(secs) {
 			var dist = Math.sqrt(dx * dx + dy * dy) - radi;
 
 			if (dist < -5) {
-				this.resolveCollision(collidable, ship);
+
 
 				var hasShield = false;
 				for (var x = 0; x < 8; x++) {
@@ -126,11 +126,15 @@ Ships.prototype.update = function(secs) {
 					}
 
 				}
-				//if (!hasShield) {
+				if (!hasShield) {
+					var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
+					this.createExplosion(collidable.diam * 5, explosionOrigin);
+					this.gameModel.asteroids.splice(j, 1);
+					//ship.pos = new Point(500, 500);
+				} else {
+					this.resolveCollision(collidable, ship);
 
-				this.createExplosion(250, new Point(400, 400));
-				//ship.pos = new Point(500, 500);
-				//}
+				}
 				break;
 			}
 			// logger.log(dist2);

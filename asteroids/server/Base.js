@@ -40,6 +40,7 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 	obj.vel.y += obj.acc.y * secs;
 
 	if (obj.vel.length() > obj.maxVel) {
+		//this fucks up something with ship velocity...
 		obj.vel.normalize(obj.maxVel);
 	}
 
