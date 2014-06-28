@@ -16,7 +16,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		var pixel = this.pixel;
 		var numPolys = 0;
 		for (var i = 0; i < this.SH; i++) {
-			numPolys += Poly.add(this.starmap[i], i, pixel, pixel, polys, false, Poly.TL);
+			numPolys += Poly.addS(this.starmap[i], i, pixel, pixel, polys, false, Poly.TL);
 		}
 
 		return numPolys;

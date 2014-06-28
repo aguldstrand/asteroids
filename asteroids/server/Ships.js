@@ -1,6 +1,7 @@
 var Base = require('./Base');
 var Point = require('../Point');
 var Asteroid = require('../Asteroid');
+var Bullet = require('../Bullet');
 
 
 function Ships(options) {
@@ -20,7 +21,7 @@ Ships.prototype.update = function(secs) {
 
 	var numShips = this.gameModel.ships.length;
 	var numBulletsInShip = 0;
-	var bulletSpeed = 150;
+	var bulletSpeed = 6;
 	var maxBulletsPerShips = 10;
 
 	this.speed = 800;
@@ -68,17 +69,21 @@ Ships.prototype.update = function(secs) {
 
 		numBulletsInShip = ship.bullets.length;
 
-		if (userInput.shoot && numBulletsInShip < maxBulletsPerShips) {
-			matrix.identity();
-			matrix.rotate(ship.rot * piOver180);
+		if (userInput.space && numBulletsInShip < maxBulletsPerShips) {
+			//matrix.identity();
+			//matrix.rotate(ship.rot * piOver180);
+
+
 			var newBullet = new Bullet();
-			var transFormedPoint = matrix.transformPoint(noseP);
+			//var transFormedPoint = matrix.transformPoint(noseP);
+			var transFormedPoint = this.rotate(noseP, new Point(), ship.rot * Math.PI / 180);
 			newBullet.pos.x = ship.pos.x + transFormedPoint.x;
 			newBullet.pos.y = ship.pos.y + transFormedPoint.y;
 			newBullet.vel.x = transFormedPoint.x * bulletSpeed;
 			newBullet.vel.y = transFormedPoint.y * bulletSpeed;
+
 			newBullet.direction = ship.rot + 90;
-			newBullet.maxVel = 250;
+			newBullet.maxVel = 500;
 			newBullet.friction = 0;
 			ship.bullets.push(newBullet);
 			numBulletsInShip++;
@@ -108,6 +113,8 @@ Ships.prototype.update = function(secs) {
 			var dx = collidable.pos.x - ship.pos.x;
 			var dy = collidable.pos.y - ship.pos.y;
 			var radi = collidable.diam + ship.diam;
+
+
 
 			// var dist = ((dx * dx) + (dy * dy)) - (radi * radi);
 
@@ -148,7 +155,7 @@ Ships.prototype.update = function(secs) {
 
 
 		for (var mb = 0; mb < numBulletsInShip; mb++) {
-			var bullet = ship.bullets[mb];
+			bullet = ship.bullets[mb];
 
 
 

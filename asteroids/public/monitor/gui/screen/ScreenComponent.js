@@ -86,15 +86,40 @@ define([
 		var polys = [];
 		var numPolys = 0;
 
+
+
+		//focus
+		var focusPoint = {
+			x: 0,
+			y: 0
+		};
+		if (gameState.ships && gameState.ships.length > 0) {
+			focusPoint.x = gameState.ships[0].pos.x - this.SW * 0.5;
+			focusPoint.y = gameState.ships[0].pos.y - this.SH * 0.5;
+			if (focusPoint.x < 0) {
+				focusPoint.x = 0;
+			}
+			if (focusPoint.x > gameState.SW - this.SW) {
+				focusPoint.x = gameState.SW - this.SW;
+			}
+			if (focusPoint.y < 0) {
+				focusPoint.y = 0;
+			}
+			if (focusPoint.y > gameState.SH - this.SH) {
+				focusPoint.y = gameState.SH - this.SH;
+			}
+		}
+		Poly.setFocusPoint(focusPoint);
+
 		//CLEAR
 		polys = [];
-		numPolys = Poly.add(0, 0, this.SW * this.pixel, this.SH * this.pixel, polys);
+		numPolys = Poly.addS(0, 0, this.SW * this.pixel, this.SH * this.pixel, polys);
 		this.draw(polys, numPolys, 0, 0, 0, 1);
 
 		//STARMAP
 		polys = [];
 		numPolys = this.starmap.update(step, polys);
-		//this.draw(polys, numPolys, 1, 1, 0, 1);
+		this.draw(polys, numPolys, 1, 1, 0, 1);
 
 		//EXPLOSIONS
 		polys = [];
@@ -113,10 +138,9 @@ define([
 
 
 		//gravity - debug
-
 		polys = [];
-		numPolys = this.debug.update(step, polys, gameState.gravity);
-		this.draw(polys, numPolys, 1, 0, 0, 1);
+		//numPolys = this.debug.update(step, polys, gameState.gravity);
+		//this.draw(polys, numPolys, 1, 0, 0, 1);
 
 		//FPS BAR
 		polys = [];
@@ -153,9 +177,6 @@ define([
 		this.SW = parseInt(canvas.width / this.pixel, 10);
 		this.SH = parseInt(canvas.height / this.pixel, 10);
 
-
-		this.WW = this.SW * 5;
-		this.WH = this.SH;
 		this.canvas = canvas;
 
 		this.setup();

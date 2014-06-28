@@ -6,8 +6,8 @@ function GameModel() {
 	this.asteroids = [];
 	this.explosions = [];
 
-	this.SW = 1000;
-	this.SH = 1000;
+	this.SW = 3000;
+	this.SH = 3000;
 }
 
 module.exports = GameModel;

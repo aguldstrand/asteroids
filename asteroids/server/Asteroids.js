@@ -32,11 +32,10 @@ Asteroids.prototype.update = function(secs) {
 			asteroid.pos.y = this.SH - 1;
 		}
 		asteroid.rot += asteroid.rotVelocity;
-		if (asteroid.rot > 1000) {
-			asteroid.rot -= 1000;
-		}
-		if (asteroid.rot < -1000) {
-			asteroid.rot += 1000;
+
+		asteroid.rot %= 360;
+		if (asteroid.rot < 0) {
+			asteroid.rot = 360;
 		}
 
 

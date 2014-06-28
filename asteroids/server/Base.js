@@ -41,7 +41,7 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	if (obj.vel.length() > obj.maxVel) {
 		//this fucks up something with ship velocity...
-		obj.vel.normalize(obj.maxVel);
+		obj.vel.normalize(obj.maxVel * secs);
 	}
 
 
@@ -149,5 +149,13 @@ Base.prototype.createExplosion = function(size /*int*/ , pos /*Point*/ ) {
 	explosion.pos = pos;
 	explosion.size = size;
 	this.gameModel.explosions.push(explosion);
+};
+
+Base.prototype.rotate = function(p, origin, angle) {
+	//angle = angle * Math.PI / 180.0;
+	return new Point(
+		Math.cos(angle) * (p.x - origin.x) - Math.sin(angle) * (p.y - origin.y) + origin.x,
+		Math.sin(angle) * (p.x - origin.x) + Math.cos(angle) * (p.y - origin.y) + origin.y
+	);
 };
 module.exports = Base;
