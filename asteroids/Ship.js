@@ -1,4 +1,5 @@
 var BasePhysics = require("./BasePhysics");
+var Drone = require("./Drone");
 
 function Ship(id, options) {
 	this.id = id;
@@ -6,6 +7,7 @@ function Ship(id, options) {
 	this.color = options.color || 'FF0000';
 	this.rot = 0;
 	this.bullets = [];
+	this.drones = [new Drone(), new Drone()];
 	this.score = 0;
 
 	this.spawnTimer = -1;

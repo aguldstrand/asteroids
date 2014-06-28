@@ -38,15 +38,11 @@ Asteroids.prototype.update = function(secs) {
 			asteroid.rot = 360;
 		}
 
-
-
 		//var ag:Point = getGravity(asteroid.pos);
 		//asteroid.vel.x += ag.x;
 		//asteroid.vel.y += ag.y;
 		//asteroid.vel.x = 10;
 		this.applyNewPositions(asteroid, new Point(0, 0), secs);
-
-
 
 		for (var j = 0; j < len; j++) {
 			var collidable = this.gameModel.asteroids[j];
@@ -75,6 +71,7 @@ Asteroids.prototype.update = function(secs) {
 		//Tracker.track("ASteroid : " + asteroid.pos.x);
 	}
 };
+
 Asteroids.prototype.createAsteroids = function(num) {
 	num = num || 100;
 	for (var i = 0; i < num; i++) {
@@ -88,4 +85,5 @@ Asteroids.prototype.createAsteroids = function(num) {
 		this.gameModel.asteroids.push(asteroid);
 	}
 };
+
 module.exports = Asteroids;

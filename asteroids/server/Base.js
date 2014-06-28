@@ -88,12 +88,9 @@ Base.prototype.resolveCollision = function(ballA, ballB) {
 	// change in momentum
 	ballA.vel = ballA.vel.add(impulse.multiply(im1));
 	ballB.vel = ballB.vel.subtract(impulse.multiply(im2));
-
 };
+
 Base.prototype.getGravity = function(pos /*Point*/ ) {
-
-
-
 	var _x = parseInt(parseInt(pos.x, 10) / this.gravityRes, 10);
 	var _y = parseInt(parseInt(pos.y, 10) / this.gravityRes, 10);
 
@@ -120,6 +117,7 @@ Base.prototype.createExplosion = function(size /*int*/ , pos /*Point*/ ) {
 	explosion.size = size;
 	this.gameModel.explosions.push(explosion);
 };
+
 Base.prototype.removeAsteroid = function(asteroid /*Asteroid*/ ) {
 
 	var ret = -1;
@@ -158,4 +156,80 @@ Base.prototype.rotate = function(p, origin, angle) {
 		Math.sin(angle) * (p.x - origin.x) + Math.cos(angle) * (p.y - origin.y) + origin.y
 	);
 };
+
+Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
+
+	// This should be optimised with a lookup grid or quad tree or similar
+
+	// Targets can be of any type, but should have a:
+	// * pos property so that it can be pursued
+	// * health property so that it can be prioritized
+	// * distance property that is updated every time this function is run. Ony used as a cache of the distance calculation.
+	var targets = [];
+
+	var i;
+	var radiusSquared = radius * radius;
+
+	// Find ships
+	var ships = this.gameModel.ships;
+	var numShips = ships.length;
+	for (i = 0; i < numShips; i++) {
+		var ship = ships[i];
+		if (ship.id === playerId) {
+			continue;
+		}
+
+		var shipPos = ship.pos;
+
+		var dx = pos.x - shipPos.x;
+		var dy = pos.y - shipPos.y;
+		var distanceSquared = dx * dx + dy * dy;
+
+		if (radiusSquared <= distanceSquared) {
+			ship.distance = Math.sqrt(distanceSquared);
+		}
+
+		targets.push(ship);
+
+		// Find drones
+		var drones = ship.drones;
+		var numDrones = drones.length;
+		for (j = 0; j < numDrones; j++) {
+			var drone = drones[i];
+			var dronePos = drone.pos;
+
+			dx = pos.x - dronePos.x;
+			dy = pos.y - dronePos.y;
+			distanceSquared = dx * dx + dy * dy;
+
+			if (radiusSquared <= distanceSquared) {
+				drone.distance = Math.sqrt(distanceSquared);
+			}
+
+			targets.push(drone);
+		}
+	}
+
+	// Find asteroids
+	var asteroids = this.gameModel.asteroids;
+	var numAsteroids = asteroids.length;
+	for (var i = 0; i < numAsteroids; i++) {
+		var asteroid = asteroids[i];
+
+		var asteroidPos = asteroid.pos;
+
+		var dx = pos.x - asteroidPos.x;
+		var dy = pos.y - asteroidPos.y;
+		var distanceSquared = dx * dx + dy * dy;
+
+		if (radiusSquared <= distanceSquared) {
+			asteroid.distance = Math.sqrt(distanceSquared);
+		}
+
+		targets.push(asteroid);
+	}
+
+	return targets;
+};
+
 module.exports = Base;

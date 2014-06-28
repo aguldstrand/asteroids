@@ -21,13 +21,15 @@
 	<script src="/socket.io/socket.io.js"></script>
     <script>
 
+        var latestState;
+
         var io = io.connect();
 
         // monitor
         io.emit('monitor:connect');
         io.on('monitor:game-state', function(state) {
             // update playing field
-            output.innerText = JSON.stringify(state, null, 2, null);
+            latestState = state;
         });
 
         // controller
@@ -46,6 +48,9 @@
         	io.emit('controller:input', input);
         }, 200);
 
+        setInterval(function() {
+            output.innerText = JSON.stringify(latestState, null, 2, null);
+        }, 200);
 
     </script>
 
