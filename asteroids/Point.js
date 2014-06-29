@@ -12,11 +12,21 @@ Point.prototype.length = function() {
 };
 
 Point.prototype.normalize = function(len) {
-
 	var mag = Math.sqrt(this.x * this.x + this.y * this.y);
-
 	this.x = this.x / mag * len;
 	this.y = this.y / mag * len;
+	return this;
+};
+
+Point.prototype.truncate = function(maxLen) {
+	var mag = Math.sqrt(this.x * this.x + this.y * this.y);
+
+	if (mag > maxLen) {
+		this.x = this.x / mag * maxLen;
+		this.y = this.y / mag * maxLen;
+	}
+
+	return this;
 };
 
 Point.prototype.subtract = function(v) {
@@ -55,12 +65,14 @@ Point.prototype.interpolate = function(v, f) {
 Point.prototype.length = function() {
 	return Math.sqrt(this.x * this.x + this.y * this.y);
 };
+/*
 Point.prototype.normalize = function(thickness) {
 	var l = this.length();
 	this.x = this.x / l; // * thickness;
 	this.y = this.y / l; // * thickness;
 	return this;
 };
+*/
 Point.prototype.orbit = function(origin, arcWidth, arcHeight, degrees) {
 	var radians = degrees * (Math.PI / 180);
 	this.x = origin.x + arcWidth * Math.cos(radians);

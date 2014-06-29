@@ -128,12 +128,16 @@ Drones.prototype.update = function(secs) {
 				drone.acc.x = drone.acc.x || 0;
 				drone.acc.y = drone.acc.y || 0;
 
-				drone.acc = ship.pos.subtract(drone.pos);
-				//drone.acc = drone.acc.normalize(Math.pow(drone.acc.length(), 3));
+				var dest = ship.pos.add(ship.vel.multiply(-1).normalize(100));
 
+				/*
+				drone.acc = dest.subtract(drone.pos);
 				if (drone.acc.length() > this.maxAcceleration) {
 					drone.acc = drone.acc.normalize(this.maxAcceleration);
 				}
+				*/
+
+				drone.vel = follow(ship, drone, 1500, 100);
 
 				drone.rot = this.radiansToDegrees(Math.atan2(drone.vel.y, drone.vel.x));
 
@@ -141,7 +145,34 @@ Drones.prototype.update = function(secs) {
 			}
 		}
 	}
-
 };
+
+function seek(destination, subject, maxVel) {
+	return destination.subtract(subject.pos).truncate(maxVel);
+}
+
+function avoid(destination, subject, maxVel) {
+	return subject.pos.subtract(destination).truncate(maxVel);
+}
+
+function arrive(destination, subject, maxVel, breakingDistance) {
+	var direction = destination.subtract(subject.pos);
+	var distance = direction.length();
+
+	if (distance > breakingDistance) {
+		return new Point();
+	} else {
+		return direction.multiply(-1 - distance / breakingDistance);
+	}
+}
+
+function follow(target, subject, maxVel, breakingDistance) {
+	var dest = target.pos.add(target.vel.multiply(-1).normalize(100)); // 100px behind the target
+
+	var vel = seek(dest, subject, maxVel);
+	// vel = vel.add(arrive(dest, subject, maxVel, breakingDistance));
+
+	return vel;
+}
 
 module.exports = Drones;
