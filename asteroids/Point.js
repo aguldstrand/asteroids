@@ -72,20 +72,20 @@ Point.prototype.offset = function(dx, dy) {
 };
 
 
-	Point.interpolate = function(pt1, pt2, f) {
-		return new Point((pt1.x + pt2.x) * f, (pt1.y + pt2.y) * f);
-	};
-	Point.polar = function(len, angle) {
-		return new Point(len * Math.sin(angle), len * Math.cos(angle));
-	};
-	Point.distance = function(pt1, pt2) {
-		var x = pt1.x - pt2.x;
-		var y = pt1.y - pt2.y;
-		return Math.sqrt(x * x + y * y);
-	};
-	Point.prototype.dot = function(v) {
+Point.interpolate = function(pt1, pt2, f) {
+	return new Point((pt1.x + pt2.x) * f, (pt1.y + pt2.y) * f);
+};
+Point.polar = function(len, angle) {
+	return new Point(len * Math.sin(angle), len * Math.cos(angle));
+};
+Point.distance = function(pt1, pt2) {
+	var x = pt1.x - pt2.x;
+	var y = pt1.y - pt2.y;
+	return Math.sqrt(x * x + y * y);
+};
+Point.prototype.dot = function(v) {
 
-		return this.x * v.x + this.y * v.y;
+	return this.x * v.x + this.y * v.y;
 
-	};
+};
 module.exports = Point;

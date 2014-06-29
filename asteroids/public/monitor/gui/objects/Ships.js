@@ -148,9 +148,11 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 
 			//FUCK
 
+			var j;
+
 			//SHIELD
 			var damageReflection = {};
-			for (var j = 0; j < 8; j++) {
+			for (j = 0; j < 8; j++) {
 				var rs1 = this.rotate_point(this.shieldA1, this.ds_rotation + j * 45);
 				var rs2 = this.rotate_point(this.shieldA2, this.ds_rotation + j * 45);
 
@@ -163,11 +165,17 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			}
 
 			//DRONE
-			var droneP = this.rotate_point(this.droneP, this.dp_rotation);
-			var droneLW = this.rotate_point(this.droneLW, ship.rot);
-			var droneRW = this.rotate_point(this.droneRW, ship.rot);
-			var droneN = this.rotate_point(this.droneN, ship.rot);
-			numPolys += Poly.addR(ship.pos.x + droneP.x, ship.pos.y + droneP.y, droneLW.x, droneLW.y, droneRW.x, droneRW.y, droneN.x, droneN.y, polys, 1);
+			var drones = ship.drones;
+			var numDrones = drones.length;
+			for (j = 0; j < numDrones; j++) {
+				var drone = drones[j];
+
+				var droneP = this.rotate_point(this.droneP, this.dp_rotation);
+				var droneLW = this.rotate_point(this.droneLW, drone.rot);
+				var droneRW = this.rotate_point(this.droneRW, drone.rot);
+				var droneN = this.rotate_point(this.droneN, drone.rot);
+				numPolys += Poly.addR(drone.pos.x, drone.pos.y, droneLW.x, droneLW.y, droneRW.x, droneRW.y, droneN.x, droneN.y, polys, 1);
+			}
 
 
 			//BULLETS

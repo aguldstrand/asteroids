@@ -6,7 +6,6 @@ function Base(options) {
 
 	if (options) {
 
-		console.log(this.gameModel);
 		this.gravity = options.gravity;
 		this.gameModel = options.gm;
 		this.gravityRes = options.gravityRes;
@@ -20,10 +19,13 @@ Base.prototype.degreesToRadians = function(degrees) {
 	return degrees * Math.PI / 180;
 };
 
+Base.prototype.radiansToDegrees = function(degrees) {
+	return degrees * 180 / Math.PI;
+};
+
 Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ , secs /*Number*/ ) {
 
 	var g = this.getGravity(obj.pos);
-
 
 	obj.acc.x = g.x + acc.x;
 	obj.acc.y = g.y + acc.y;
@@ -41,16 +43,12 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	if (obj.vel.length() > obj.maxVel) {
 		//this fucks up something with ship velocity...
-		obj.vel.normalize(obj.maxVel * secs);
+		// obj.vel.normalize(obj.maxVel * secs); // Velocity should not be scaled to frame time
+		obj.vel.normalize(obj.maxVel);
 	}
-
-
 
 	obj.pos.x += obj.vel.x * secs;
 	obj.pos.y += obj.vel.y * secs;
-
-
-
 };
 
 
