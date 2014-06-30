@@ -183,11 +183,11 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 		var dy = pos.y - shipPos.y;
 		var distanceSquared = dx * dx + dy * dy;
 
-		if (radiusSquared <= distanceSquared) {
+		if (radiusSquared >= distanceSquared) {
 			ship.distance = Math.sqrt(distanceSquared);
+			targets.push(ship);
 		}
 
-		targets.push(ship);
 
 		// Find drones
 		var drones = ship.drones;
@@ -200,11 +200,11 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 			dy = pos.y - dronePos.y;
 			distanceSquared = dx * dx + dy * dy;
 
-			if (radiusSquared <= distanceSquared) {
+			if (radiusSquared >= distanceSquared) {
 				drone.distance = Math.sqrt(distanceSquared);
+				targets.push(drone);
 			}
 
-			targets.push(drone);
 		}
 	}
 
@@ -220,11 +220,11 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 		var dy = pos.y - asteroidPos.y;
 		var distanceSquared = dx * dx + dy * dy;
 
-		if (radiusSquared <= distanceSquared) {
+		if (radiusSquared >= distanceSquared) {
 			asteroid.distance = Math.sqrt(distanceSquared);
+			targets.push(asteroid);
 		}
 
-		targets.push(asteroid);
 	}
 
 	return targets;
