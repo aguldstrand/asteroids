@@ -125,8 +125,8 @@ Drones.prototype.update = function(secs) {
 				drone.pos.y = drone.pos.y || ship.pos.y;
 				drone.vel.x = drone.vel.x || ship.vel.x;
 				drone.vel.y = drone.vel.y || 0;
-				drone.acc.x = drone.acc.x || 0;
-				drone.acc.y = drone.acc.y || 0;
+				drone.acc.x = 0;
+				drone.acc.y = 0;
 
 				var dest = ship.pos.add(ship.vel.multiply(-1).normalize(100));
 
@@ -137,7 +137,7 @@ Drones.prototype.update = function(secs) {
 				}
 				*/
 
-				drone.vel = follow(ship, drone, 1500, 100);
+				drone.vel = follow(ship, drone, ship.vel.length() + 100, 100);
 
 				drone.rot = this.radiansToDegrees(Math.atan2(drone.vel.y, drone.vel.x));
 
@@ -147,32 +147,25 @@ Drones.prototype.update = function(secs) {
 	}
 };
 
-function seek(destination, subject, maxVel) {
-	return destination.subtract(subject.pos).truncate(maxVel);
-}
-
-function avoid(destination, subject, maxVel) {
-	return subject.pos.subtract(destination).truncate(maxVel);
-}
-
-function arrive(destination, subject, maxVel, breakingDistance) {
-	var direction = destination.subtract(subject.pos);
-	var distance = direction.length();
-
-	if (distance > breakingDistance) {
-		return new Point();
-	} else {
-		return direction.multiply(-1 - distance / breakingDistance);
-	}
-}
-
 function follow(target, subject, maxVel, breakingDistance) {
 	var dest = target.pos.add(target.vel.multiply(-1).normalize(100)); // 100px behind the target
+	var direction = dest.subtract(subject.pos);
+	var distance = direction.length();
 
-	var vel = seek(dest, subject, maxVel);
-	// vel = vel.add(arrive(dest, subject, maxVel, breakingDistance));
+	console.log(distance);
 
-	return vel;
+	var result;
+
+	if (distance < 5) { // match speed if close enough
+		result = direction.normalize(target.vel.length());
+	} else if (distance < 50) { // start to decrease speed
+		var targetSpeed = target.vel.length();
+		result = direction.normalize(((maxVel - targetSpeed) * direction.length() / 50) + targetSpeed);
+	} else {
+		result = direction.normalize(maxVel);
+	}
+
+	return result;
 }
 
 module.exports = Drones;

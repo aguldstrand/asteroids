@@ -2,3 +2,4 @@
 /asteroids/npm-debug.log
 node_modules
 *.sublime-*
+obj
