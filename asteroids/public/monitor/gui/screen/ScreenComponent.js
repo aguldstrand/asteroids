@@ -7,7 +7,9 @@ define([
 	'monitor/gui/objects/Debug',
 	'monitor/gui/objects/MiniMap',
 
-	'monitor/gui/objects/Explosions'
+	'monitor/gui/objects/Explosions',
+
+	'hektorskraffs/webgl'
 ], function(
 	Bifrost,
 	Poly,
@@ -16,77 +18,54 @@ define([
 	Asteroids,
 	Debug,
 	MiniMap,
-	Explosions) {
+	Explosions,
+
+	WebGL) {
 
 	function ScreenComponent(options) {
 		if (options) {
 			Bifrost.BaseComponent.call(this, options);
 
 			this.canvas = null;
-			this.SW = 0;
-			this.SH = 0;
+			this.screenWidth = 0;
+			this.screenHeight = 0;
 			this.pixel = 1;
-
-
 		}
 	}
 
 	ScreenComponent.prototype = new Bifrost.BaseComponent();
 
 
-
 	ScreenComponent.prototype.setup = function() {
-
-		this.starmap1 = new Starmap(this.pixel, this.SW, this.SH, 2, -0.4);
-		this.starmap2 = new Starmap(this.pixel, this.SW, this.SH, 4, -0.6);
-		this.explosions = new Explosions(this.pixel, this.SW, this.SH);
-		this.ships = new Ships(this.pixel, this.SW, this.SH);
-		this.asteroids = new Asteroids(this.pixel, this.SW, this.SH);
-		this.debug = new Debug(this.pixel, this.SW, this.SH);
-		this.miniMap = new MiniMap(this.pixel, this.SW, this.SH);
+		this.starmap1 = new Starmap(this.pixel, this.screenWidth, this.screenHeight, 2, -0.4);
+		this.starmap2 = new Starmap(this.pixel, this.screenWidth, this.screenHeight, 4, -0.6);
+		this.explosions = new Explosions(this.pixel, this.screenWidth, this.screenHeight);
+		this.ships = new Ships(this.pixel, this.screenWidth, this.screenHeight);
+		this.asteroids = new Asteroids(this.pixel, this.screenWidth, this.screenHeight);
+		this.debug = new Debug(this.pixel, this.screenWidth, this.screenHeight);
+		this.miniMap = new MiniMap(this.pixel, this.screenWidth, this.screenHeight);
 	};
 
 
 	ScreenComponent.prototype.init = function() {
 		// Get A WebGL context
 		var canvas = this.canvas;
-		var gl = canvas.getContext('webgl');
-		window.gl = gl;
-		//var gl = getWebGLContext(canvas);
-		if (!gl) {
+
+		if (!WebGL.init(canvas)) {
 			console.error('no GL');
 			return;
 		}
-		this.gl = gl;
+		window.gl = WebGL.gl;
+		this.gl = WebGL.gl;
 
-		// setup GLSL program
-		var vertexShader = window.createShaderFromScriptElement(gl, '2d-vertex-shader');
-		var fragmentShader = window.createShaderFromScriptElement(gl, '2d-fragment-shader');
-		window.program = window.createProgram(gl, [vertexShader, fragmentShader]);
-		gl.useProgram(window.program);
+		WebGL.resize(canvas.width, canvas.height);
 
-		// look up where the vertex data needs to go.
-		var positionLocation = gl.getAttribLocation(window.program, 'a_position');
-
-		// lookup uniforms
-		var resolutionLocation = gl.getUniformLocation(window.program, 'u_resolution');
-		//var colorLocation = gl.getUniformLocation(window.program, 'u_color');
-
-		// set the resolution
-		gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-
-		// Create a buffer.
-		var buffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-		gl.enableVertexAttribArray(positionLocation);
-		gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+		this.colorProgram = WebGL.loadProgram('monitor/gui/shaders/color.vert', 'monitor/gui/shaders/color.frag', ['a_position'], ['u_color', 'u_position', 'u_rotation', 'u_scale', 'u_resolution']);
 	};
 
 
 
 	ScreenComponent.prototype.update = function(step, gameState) {
-
-
 		var polys = [];
 		var numPolys = 0;
 
@@ -129,8 +108,8 @@ define([
 		Poly.setFocusPoint(focusPoint);
 
 		//CLEAR
-		polys = [];
-		numPolys = Poly.addS(0, 0, this.SW * this.pixel, this.SH * this.pixel, polys);
+		/*polys = [];
+		numPolys = Poly.addS(0, 0, this.screenWidth * this.pixel, this.screenHeight * this.pixel, polys);
 		this.draw(polys, numPolys, 0, 0, 0, 1);
 
 		//STARMAP
@@ -164,11 +143,6 @@ define([
 		//this.draw(polys, numPolys, 1, 0, 0, 1);
 
 
-		//minimap BG
-		/*polys = [];
-		numPolys = Poly.addS(0, 0, 150, 150, polys, false, false, 0, 0);
-		this.draw(polys, numPolys, 0, 0, 0, 0.8);*/
-
 		//Minimap
 		polys = [];
 		numPolys = this.miniMap.updateAsteroids(step, polys, gameState);
@@ -183,20 +157,30 @@ define([
 		//FPS BAR
 		polys = [];
 		numPolys = Poly.add(500, 5, step * 10, 4, polys);
-		this.draw(polys, numPolys, 1, 0, 0, 1);
+		this.draw(polys, numPolys, 1, 0, 0, 1);*/
 
 
-
+		this.gameState = gameState;
+		this.draw();
 	};
 
 
 	ScreenComponent.prototype.draw = function(polys, numPolys, red, green, blue, alpha) {
-		var gl = this.gl;
+		if (!WebGL.useProgram(this.colorProgram)) {
+			return;
+		}
+
+		WebGL.beginDraw([0.0, 0.0, 0.0, 1.0]);
+
+
+		this.asteroids.draw(this.colorProgram, this.gameState.asteroids);
+
+		/*var gl = this.gl;
 		var colorLocation = gl.getUniformLocation(window.program, 'u_color');
 
 		gl.uniform4f(colorLocation, red, green, blue, alpha);
 		gl.bufferData(gl.ARRAY_BUFFER, new window.Float32Array(polys), gl.STATIC_DRAW);
-		gl.drawArrays(gl.TRIANGLES, 0, numPolys);
+		gl.drawArrays(gl.TRIANGLES, 0, numPolys);*/
 
 	};
 
@@ -206,20 +190,31 @@ define([
 		this.baseRender('screen', {});
 
 		var canvas = this.$el.find('canvas')[0];
+		this.canvas = canvas;
+
+		this.resize();
+
+		this.init();
+		this.setup();
+	};
+
+	ScreenComponent.prototype.resize = function() {
+		var canvas = this.canvas;
 
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 
 		//this.pixel = (canvas.width + canvas.height) * 0.0025;
 
-		this.SW = parseInt(canvas.width / this.pixel, 10);
-		this.SH = parseInt(canvas.height / this.pixel, 10);
+		this.screenWidth = parseInt(canvas.width / this.pixel, 10);
+		this.screenHeight = parseInt(canvas.height / this.pixel, 10);
+	};
 
-		this.canvas = canvas;
-
-		this.setup();
-		this.init();
-
+	ScreenComponent.prototype.events = {
+		'window': [{
+			event: ['resize'],
+			handler: 'resize'
+		}]
 	};
 
 	return ScreenComponent;

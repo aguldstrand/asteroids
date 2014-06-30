@@ -1,8 +1,18 @@
-define(['monitor/gui/objects/Poly'], function(Poly) {
-	function Asteroids(pixel, SW, SH) {
+define([
+	'monitor/gui/objects/Poly',
+
+	'hektorskraffs/webgl',
+	'hektorskraffs/webgl-util'
+], function(
+	Poly,
+
+	WebGL,
+	Util
+) {
+	function Asteroids(pixel, screenWidth, screenHeight) {
 		this.pixel = pixel;
-		this.SH = SH;
-		this.SW = SW;
+		this.screenHeight = screenHeight;
+		this.screenWidth = screenWidth;
 		this.asteroids = [];
 
 		this.p = {
@@ -10,7 +20,43 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			y: 0
 		};
 
+		this.color = [0.5, 0.5, 0.5, 1];
+
+		this.load();
 	}
+
+
+	Asteroids.prototype.load = function() {
+		var vertices = [];
+		var x = 0;
+		var y = 0;
+		var radius = 1.0;
+		var rotation = 0.0;
+		var point = {
+			x: 1,
+			y: 0
+		};
+
+		Poly.setFocusPoint({
+			x: 0,
+			y: 0
+		});
+
+		for (var i = 0; i < 8; i++) {
+			var ap = this.rotate_point(point, (i * 45 - 45) + rotation);
+			var rp = this.rotate_point(point, (i * 45) + rotation);
+
+			Poly.addR(x, y, ap.x, ap.y, rp.x, rp.y, 0, 0, vertices, 1);
+		}
+
+		this.polygon = WebGL.createPolygon(vertices);
+
+
+		Util.init(WebGL);
+		Util.resize(window.innerWidth, window.innerHeight);
+	};
+
+
 	Asteroids.prototype.rotate_point = function(point, angle) {
 		angle = angle * Math.PI / 180.0;
 		return {
@@ -19,7 +65,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		};
 	};
 	Asteroids.prototype.update = function(step, polys, asteroids) {
-		var numPolys = 0;
+		/*var numPolys = 0;
 		var pixel = this.pixel;
 		var len = asteroids.length;
 		for (var i = 0; i < len; i++) {
@@ -40,12 +86,43 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				//rp.x = rp.x + Math.random() * asteroid.diam;
 
 
-				numPolys += Poly.addR(asteroid.pos.x, asteroid.pos.y, ap.x, ap.y, rp.x, rp.y, /*(Math.random() - 0.5) * asteroid.diam, (Math.random() - 0.5) * asteroid.diam*/ 0, 0, polys, 1);
+				// numPolys += Poly.addR(asteroid.pos.x, asteroid.pos.y, ap.x, ap.y, rp.x, rp.y, 0, 0, polys, 1);
 			}
 		}
 
 
-		return numPolys;
+		return numPolys;*/
+	};
+
+	Asteroids.prototype.draw = function(program, asteroids) {
+		var polygon = this.polygon;
+		var uniforms = program.uniforms;
+
+		WebGL.bindAttribBuffer(polygon.vertexBuffer, program.attributes.a_position, polygon.itemSize);
+		WebGL.bindUniform(uniforms.u_color, this.color);
+
+		var positionLocation = uniforms.u_position;
+		var rotationLocation = uniforms.u_rotation;
+		var scaleLocation = uniforms.u_scale;
+
+		var DEG_TO_RAD = Math.PI / 180.0;
+
+		var gl = WebGL.gl;
+		var vertexCount = polygon.vertexCount;
+		for (var i = asteroids.length; i--; ) {
+			var asteroid = asteroids[i];
+			var pos = asteroid.pos;
+
+			gl.uniform2f(positionLocation, pos.x, pos.y);
+			gl.uniform1f(rotationLocation, asteroid.rot * DEG_TO_RAD);
+			gl.uniform1f(scaleLocation, asteroid.diam);
+
+			gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+		}
+
+
+
+		Util.drawRectangleColor(program, [0.0, 0.0], [400.0], [0, 255, 0, 1]);
 	};
 
 
