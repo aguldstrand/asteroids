@@ -37,6 +37,8 @@ define([
 
 
 	ScreenComponent.prototype.setup = function() {
+		Poly.setFocusPoint({x: 0, y: 0});
+
 		this.starmap1 = new Starmap(this.pixel, this.screenWidth, this.screenHeight, 2, -0.4);
 		this.starmap2 = new Starmap(this.pixel, this.screenWidth, this.screenHeight, 4, -0.6);
 		this.explosions = new Explosions(this.pixel, this.screenWidth, this.screenHeight);
@@ -174,6 +176,7 @@ define([
 
 
 		this.asteroids.draw(this.colorProgram, this.gameState.asteroids);
+		this.ships.draw(this.colorProgram, this.gameState.ships);
 
 		/*var gl = this.gl;
 		var colorLocation = gl.getUniformLocation(window.program, 'u_color');

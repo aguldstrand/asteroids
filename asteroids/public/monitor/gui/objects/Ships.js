@@ -1,4 +1,12 @@
-define(['monitor/gui/objects/Poly'], function(Poly) {
+define([
+	'monitor/gui/objects/Poly',
+
+	'hektorskraffs/webgl'
+], function(
+	Poly,
+
+	WebGL
+) {
 	function Ships(pixel, SW, SH) {
 		this.pixel = pixel;
 		this.SH = SH;
@@ -77,8 +85,41 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		this.ds_rotation = 0;
 		this.d_rotation = 0;
 
+		this.color = [0, 1, 0, 1];
 
+		this.load();
 	}
+
+	Ships.prototype.load = function() {
+		var vertices = [];
+
+		var x = 0;
+		var y = 0;
+		var rotation = 0;
+
+		var Lwing = this.rotate_point(this.LwingP, rotation);
+		var Lwingi = this.rotate_point(this.LwingPi, rotation);
+		var Rwing = this.rotate_point(this.RwingP, rotation);
+		var Rwingi = this.rotate_point(this.RwingPi, rotation);
+		var Nose = this.rotate_point(this.noseP, rotation);
+		var Rear = this.rotate_point(this.rearP, rotation);
+		var RearIR = this.rotate_point(this.rearIR, rotation);
+		var RearIL = this.rotate_point(this.rearIL, rotation);
+
+		Poly.addR(x, y, Lwing.x, Lwing.y, Lwingi.x, Lwingi.y, Nose.x, Nose.y, vertices, 1);
+		Poly.addR(x, y, Rwing.x, Rwing.y, Rwingi.x, Rwingi.y, Nose.x, Nose.y, vertices, 1);
+		Poly.addR(x, y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, Rear.x, Rear.y, vertices, 1);
+		Poly.addR(x, y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, vertices, 1);
+		Poly.addR(x, y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, vertices, 1);
+
+		// Poly.addR(x, y, 0, 0, 2, 2, ship.vel.x, ship.vel.y, polys, 1);
+
+
+		this.shipPolygon = WebGL.createPolygon(vertices);
+	};
+
+
+
 
 	Ships.prototype.rotate_point = function(point, angle) {
 		angle = angle * Math.PI / 180.0;
@@ -196,8 +237,34 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 
 
 		return numPolys;
+	};
 
 
+	Ships.prototype.draw = function(program, ships) {
+		var polygon = this.shipPolygon;
+		var uniforms = program.uniforms;
+
+		WebGL.bindAttribBuffer(polygon.vertexBuffer, program.attributes.a_position, polygon.itemSize);
+		WebGL.bindUniform(uniforms.u_color, this.color);
+
+		var positionLocation = uniforms.u_position;
+		var rotationLocation = uniforms.u_rotation;
+		var scaleLocation = uniforms.u_scale;
+
+		var DEG_TO_RAD = Math.PI / 180.0;
+
+		var gl = WebGL.gl;
+		var vertexCount = polygon.vertexCount;
+		for (var i = ships.length; i--; ) {
+			var ship = ships[i];
+			var pos = ship.pos;
+
+			gl.uniform2f(positionLocation, pos.x, pos.y);
+			gl.uniform1f(rotationLocation, ship.rot * DEG_TO_RAD);
+			gl.uniform1f(scaleLocation, 1.0);
+
+			gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+		}
 	};
 
 
