@@ -69,7 +69,7 @@ Ships.prototype.update = function(secs) {
 
 		numBulletsInShip = ship.bullets.length;
 
-		if (userInput.space && numBulletsInShip < maxBulletsPerShips) {
+		if (userInput.space && ship.bulletTimer >= 0.1) {
 			//matrix.identity();
 			//matrix.rotate(ship.rot * piOver180);
 
@@ -86,8 +86,9 @@ Ships.prototype.update = function(secs) {
 			newBullet.maxVel = 500;
 			newBullet.friction = 0;
 			ship.bullets.push(newBullet);
-			numBulletsInShip++;
+			ship.bulletTimer = 0;
 		}
+		ship.bulletTimer += secs;
 
 		ship.pos.x %= this.SW;
 		ship.pos.y %= this.SH;

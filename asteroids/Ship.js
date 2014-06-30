@@ -13,6 +13,7 @@ function Ship(id, options) {
 	this.spawnTimer = -1;
 	this.shieldHealth = [0, 0, 0, 0, 0, 0, 0, 0];
 	this.shieldStarter = 64;
+	this.bulletTimer = 0;
 
 	BasePhysics.apply(this);
 

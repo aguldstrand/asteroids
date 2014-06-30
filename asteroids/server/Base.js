@@ -193,7 +193,7 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 		var drones = ship.drones;
 		var numDrones = drones.length;
 		for (j = 0; j < numDrones; j++) {
-			var drone = drones[j];
+			var drone = drones[i];
 			var dronePos = drone.pos;
 
 			dx = pos.x - dronePos.x;
