@@ -98,19 +98,30 @@ define([
 			y: 0
 		};
 		if (gameState.ships && gameState.ships.length > 0) {
-			focusPoint.x = gameState.ships[0].pos.x - this.SW * 0.5;
-			focusPoint.y = gameState.ships[0].pos.y - this.SH * 0.5;
-			if (focusPoint.x < 0) {
-				focusPoint.x = 0;
+			var len = gameState.ships.length;
+			var activeShip = null;
+			for (var i = 0; i < len; i++) {
+				var ship = gameState.ships[i];
+				if (ship.id === window.io.socket.sessionid) {
+					activeShip = ship;
+					break;
+				}
 			}
-			if (focusPoint.x > gameState.SW - this.SW) {
-				focusPoint.x = gameState.SW - this.SW;
-			}
-			if (focusPoint.y < 0) {
-				focusPoint.y = 0;
-			}
-			if (focusPoint.y > gameState.SH - this.SH) {
-				focusPoint.y = gameState.SH - this.SH;
+			if (activeShip) {
+				focusPoint.x = activeShip.pos.x - this.SW * 0.5;
+				focusPoint.y = activeShip.pos.y - this.SH * 0.5;
+				if (focusPoint.x < 0) {
+					focusPoint.x = 0;
+				}
+				if (focusPoint.x > gameState.SW - this.SW) {
+					focusPoint.x = gameState.SW - this.SW;
+				}
+				if (focusPoint.y < 0) {
+					focusPoint.y = 0;
+				}
+				if (focusPoint.y > gameState.SH - this.SH) {
+					focusPoint.y = gameState.SH - this.SH;
+				}
 			}
 		}
 
@@ -152,6 +163,11 @@ define([
 		//numPolys = this.debug.update(step, polys, gameState.gravity);
 		//this.draw(polys, numPolys, 1, 0, 0, 1);
 
+
+		//minimap BG
+		/*polys = [];
+		numPolys = Poly.addS(0, 0, 150, 150, polys, false, false, 0, 0);
+		this.draw(polys, numPolys, 0, 0, 0, 0.8);*/
 
 		//Minimap
 		polys = [];

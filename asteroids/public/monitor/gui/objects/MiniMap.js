@@ -11,6 +11,8 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 	Starmap.prototype.updateShips = function(step, polys, gameModel) {
 		var numPolys = 0;
 
+
+
 		var numShips = gameModel.ships.length;
 		for (var i = 0; i < numShips; i++) {
 			var ship = gameModel.ships[i];
