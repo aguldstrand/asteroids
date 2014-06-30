@@ -8,7 +8,9 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		this.starSize = starSize;
 		this.offSet = offSet;
 
-		for (var i = 0; i < this.SH; i++) {
+		this.starHeights = this.SH / this.starSize;
+
+		for (var i = 0; i < this.starHeights; i++) {
 			this.starmap.push(parseInt((this.SW * 2) * Math.random(), 10));
 		}
 	}
@@ -24,8 +26,8 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 
 		var pixel = this.pixel;
 		var numPolys = 0;
-		for (var i = 0; i < this.SH; i++) {
-			numPolys += Poly.addS(this.starmap[i], i * 2, this.starSize, this.starSize, polys, false, Poly.TL, offsetX, offsetY);
+		for (var i = 0; i < this.starHeights; i++) {
+			numPolys += Poly.addS(this.starmap[i], i * this.starSize * 2, this.starSize, this.starSize, polys, false, Poly.TL, offsetX, offsetY);
 		}
 
 		return numPolys;

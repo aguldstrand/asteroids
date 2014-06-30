@@ -137,7 +137,8 @@ Ships.prototype.update = function(secs) {
 					var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
 					this.createExplosion(collidable.diam * 5, explosionOrigin);
 					this.gameModel.asteroids.splice(j, 1);
-					//ship.pos = new Point(500, 500);
+					ship.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
+					ship.shieldStarter = 64;
 				} else {
 					this.resolveCollision(collidable, ship);
 
@@ -145,6 +146,18 @@ Ships.prototype.update = function(secs) {
 				break;
 			}
 			// logger.log(dist2);
+		}
+
+		if (ship.shieldStarter) {
+			for (var ss = 0; ss < 8; ss++) {
+				var shieldPart = ship.shieldHealth[ss];
+				if (shieldPart < 8) {
+					shieldPart++;
+					ship.shieldHealth[ss] = shieldPart;
+					ship.shieldStarter--;
+					break;
+				}
+			}
 		}
 
 
@@ -155,7 +168,7 @@ Ships.prototype.update = function(secs) {
 
 
 		for (var mb = 0; mb < numBulletsInShip; mb++) {
-			bullet = ship.bullets[mb];
+			var bullet = ship.bullets[mb];
 
 
 

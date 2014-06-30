@@ -153,15 +153,18 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			//SHIELD
 			var damageReflection = {};
 			for (j = 0; j < 8; j++) {
-				var rs1 = this.rotate_point(this.shieldA1, this.ds_rotation + j * 45);
-				var rs2 = this.rotate_point(this.shieldA2, this.ds_rotation + j * 45);
+				var shieldHealth = ship.shieldHealth[j];
+				if (shieldHealth > 0) {
+					var rs1 = this.rotate_point(this.shieldA1, this.ds_rotation + j * 45);
+					var rs2 = this.rotate_point(this.shieldA2, this.ds_rotation + j * 45);
 
-				damageReflection = {
-					x: this.shieldA3.x + 10 - ship.shieldHealth[j],
-					y: this.shieldA3.y
-				};
-				var rs3 = this.rotate_point(damageReflection, this.ds_rotation + j * 45);
-				numPolys += Poly.addR(ship.pos.x, ship.pos.y, rs1.x, rs1.y, rs2.x, rs2.y, rs3.x, rs3.y, polys, 1);
+					damageReflection = {
+						x: this.shieldA3.x + 10 - shieldHealth,
+						y: this.shieldA3.y
+					};
+					var rs3 = this.rotate_point(damageReflection, this.ds_rotation + j * 45);
+					numPolys += Poly.addR(ship.pos.x, ship.pos.y, rs1.x, rs1.y, rs2.x, rs2.y, rs3.x, rs3.y, polys, 1);
+				}
 			}
 
 			//DRONE
