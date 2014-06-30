@@ -5,7 +5,7 @@ var Bullet = require('../Bullet');
 function Drones(options) {
 	Base.call(this, options);
 
-	this.droneRange = 100; // px
+	this.droneRange = 300; // px
 	this.rotationSpeed = 90; // 90°/s
 	this.maxAcceleration = 9000; // 900px/s²
 }
@@ -29,7 +29,7 @@ Drones.prototype.update = function(secs) {
 		var targets = this.getTargetsInRange(ship.pos, this.droneRange, ship.id);
 
 		var numTargets = targets.length;
-		if (false && numTargets) { // diable targeting until basic following works
+		if (numTargets) { // diable targeting until basic following works
 
 			var maxHealth = 0;
 			var secondMaxHealth = 0;
@@ -59,12 +59,12 @@ Drones.prototype.update = function(secs) {
 			for (j = 0; j < numDrones; j++) {
 				var drone = drones[j];
 
-				drone.pos.x = drone.pos.x || ship.pos.x;
-				drone.pos.y = drone.pos.y || ship.pos.y;
-				drone.vel.x = drone.vel.x || ship.vel.x;
+				drone.pos.x = drone.pos.x || ship.pos.x + 10;
+				drone.pos.y = drone.pos.y || ship.pos.y + 10;
+				drone.vel.x = drone.vel.x || 0;
 				drone.vel.y = drone.vel.y || 0;
-				drone.acc.x = drone.acc.x || 0;
-				drone.acc.y = drone.acc.y || 0;
+				drone.acc.x = 0;
+				drone.acc.y = 0;
 
 				var target = null;
 
@@ -79,41 +79,43 @@ Drones.prototype.update = function(secs) {
 					target = maxHealth;
 				}
 
-				// Target selected!
-				// * rotate to face it
-				var droneAngle = drone.rot;
-				var angleToTarget = Math.atan2(
-					drone.pos.y - target.pos.y,
-					drone.pos.x - target.pos.x);
+				if (target) {
+					// Target selected!
+					drone.pos.x = drone.pos.x || ship.pos.x + 10;
+					drone.pos.y = drone.pos.y || ship.pos.y + 10;
+					drone.vel.x = drone.vel.x || 0;
+					drone.vel.y = drone.vel.y || 0;
+					drone.acc.x = 0;
+					drone.acc.y = 0;
 
-				var angleDelta = droneAngle - angleToTarget;
-				var angleToTarget = Math.abs(angleDelta);
-				if (angleToTarget > 5) {
-					var direction = angleDelta > 0 ? 1 : -1;
-					drone.rot += secs * direction * this.rotationSpeed;
+					drone.vel = follow(target, drone, ship.vel.length() + 100, 100);
+
+					if (target.pos.subtract(drone.pos)) {
+						var bulletSpeed = 6;
+
+						var newBullet = new Bullet();
+						//var transFormedPoint = matrix.transformPoint(noseP);
+						var transFormedPoint = this.rotate(new Point(40, 0), new Point(), drone.rot * Math.PI / 180);
+						newBullet.pos.x = drone.pos.x + transFormedPoint.x;
+						newBullet.pos.y = drone.pos.y + transFormedPoint.y;
+						newBullet.vel.x = transFormedPoint.x * bulletSpeed;
+						newBullet.vel.y = transFormedPoint.y * bulletSpeed;
+
+						newBullet.direction = drone.rot + 90;
+						newBullet.maxVel = 500;
+						newBullet.friction = 0;
+						ship.bullets.push(newBullet);
+					}
 				}
 
-				// * accelerate
-				if (angleToTarget < 45) {
-					drone.acc.x += (Math.cos(this.degreesToRadians(ship.rot)) * this.speed);
-					drone.acc.y += (Math.sin(this.degreesToRadians(ship.rot)) * this.speed);
-				}
 
-				// * fire if facing the target and within firing range
-				if (angleToTarget <= 5) {
-
-				}
-
-				// debug
-				var angle = Math.random() * Math.PI * 2;
-				drone.pos.x = ship.pos.x + Math.cos(angle) * this.droneRange;
-				drone.pos.y = ship.pos.y + Math.sin(angle) * this.droneRange;
+				drone.rot = this.radiansToDegrees(Math.atan2(drone.vel.y, drone.vel.x));
 
 				this.applyNewPositions(drone, drone.acc, secs);
 			}
 		} else {
 
-			// No targets found, circle the ship
+			// No targets found, follow the ship
 			// How to do this?
 
 			var drones = ship.drones;
@@ -121,21 +123,12 @@ Drones.prototype.update = function(secs) {
 			for (j = 0; j < numDrones; j++) {
 				var drone = drones[j];
 
-				drone.pos.x = drone.pos.x || ship.pos.x;
-				drone.pos.y = drone.pos.y || ship.pos.y;
-				drone.vel.x = drone.vel.x || ship.vel.x;
+				drone.pos.x = drone.pos.x || ship.pos.x + 10;
+				drone.pos.y = drone.pos.y || ship.pos.y + 10;
+				drone.vel.x = drone.vel.x || 0;
 				drone.vel.y = drone.vel.y || 0;
 				drone.acc.x = 0;
 				drone.acc.y = 0;
-
-				var dest = ship.pos.add(ship.vel.multiply(-1).normalize(100));
-
-				/*
-				drone.acc = dest.subtract(drone.pos);
-				if (drone.acc.length() > this.maxAcceleration) {
-					drone.acc = drone.acc.normalize(this.maxAcceleration);
-				}
-				*/
 
 				drone.vel = follow(ship, drone, ship.vel.length() + 100, 100);
 
