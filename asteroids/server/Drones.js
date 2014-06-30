@@ -152,8 +152,6 @@ function follow(target, subject, maxVel, breakingDistance) {
 	var direction = dest.subtract(subject.pos);
 	var distance = direction.length();
 
-	console.log(distance);
-
 	var result;
 
 	if (distance < 5) { // match speed if close enough
