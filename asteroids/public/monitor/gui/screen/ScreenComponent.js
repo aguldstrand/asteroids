@@ -148,9 +148,16 @@ define([
 		//this.draw(polys, numPolys, 1, 0, 0, 1);
 
 
+		//Minimap
 		polys = [];
-		numPolys = this.miniMap.update(step, polys, gameState);
-		this.draw(polys, numPolys, 1, 0, 0, 1);
+		numPolys = this.miniMap.updateAsteroids(step, polys, gameState);
+		this.draw(polys, numPolys, 0.5, 0.5, 0.5, 1);
+
+		polys = [];
+		numPolys = this.miniMap.updateShips(step, polys, gameState);
+		this.draw(polys, numPolys, 0, 1, 0, 1);
+
+
 
 		//FPS BAR
 		polys = [];

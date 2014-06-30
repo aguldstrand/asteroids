@@ -39,7 +39,7 @@ Ships.prototype.update = function(secs) {
 		if (userInput.left) {
 
 			if (userInput.up) {
-				ship.rot -= 1;
+				ship.rot -= 6;
 			} else {
 				ship.rot -= 6;
 			}
@@ -51,7 +51,7 @@ Ships.prototype.update = function(secs) {
 		}
 		if (userInput.right) {
 			if (userInput.up) {
-				ship.rot += 1;
+				ship.rot += 6;
 			} else {
 				ship.rot += 6;
 			}
