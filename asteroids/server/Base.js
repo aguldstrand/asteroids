@@ -164,7 +164,7 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 	// * health property so that it can be prioritized
 	// * distance property that is updated every time this function is run. Ony used as a cache of the distance calculation.
 	var targets = [];
-
+	var j;
 	var i;
 	var radiusSquared = radius * radius;
 
@@ -193,7 +193,7 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 		var drones = ship.drones;
 		var numDrones = drones.length;
 		for (j = 0; j < numDrones; j++) {
-			var drone = drones[i];
+			var drone = drones[j];
 			var dronePos = drone.pos;
 
 			dx = pos.x - dronePos.x;
