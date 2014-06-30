@@ -146,7 +146,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, polys, 1);
 			numPolys += Poly.addR(ship.pos.x, ship.pos.y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, polys, 1);
 
-			//FUCK
+			numPolys += Poly.addR(ship.pos.x, ship.pos.y, 0, 0, 2, 2, ship.vel.x, ship.vel.y, polys, 1);
 
 			var j;
 
@@ -175,6 +175,8 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				var droneRW = this.rotate_point(this.droneRW, drone.rot);
 				var droneN = this.rotate_point(this.droneN, drone.rot);
 				numPolys += Poly.addR(drone.pos.x, drone.pos.y, droneLW.x, droneLW.y, droneRW.x, droneRW.y, droneN.x, droneN.y, polys, 1);
+
+				numPolys += Poly.addR(drone.pos.x, drone.pos.y, 0, 0, 2, 2, drone.vel.x, drone.vel.y, polys, 1);
 			}
 
 

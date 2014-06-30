@@ -5,6 +5,7 @@ define([
 	'monitor/gui/objects/Ships',
 	'monitor/gui/objects/Asteroids',
 	'monitor/gui/objects/Debug',
+	'monitor/gui/objects/MiniMap',
 
 	'monitor/gui/objects/Explosions'
 ], function(
@@ -14,6 +15,7 @@ define([
 	Ships,
 	Asteroids,
 	Debug,
+	MiniMap,
 	Explosions) {
 
 	function ScreenComponent(options) {
@@ -40,6 +42,7 @@ define([
 		this.ships = new Ships(this.pixel, this.SW, this.SH);
 		this.asteroids = new Asteroids(this.pixel, this.SW, this.SH);
 		this.debug = new Debug(this.pixel, this.SW, this.SH);
+		this.miniMap = new MiniMap(this.pixel, this.SW, this.SH);
 	};
 
 
@@ -143,6 +146,11 @@ define([
 		polys = [];
 		//numPolys = this.debug.update(step, polys, gameState.gravity);
 		//this.draw(polys, numPolys, 1, 0, 0, 1);
+
+
+		polys = [];
+		numPolys = this.miniMap.update(step, polys, gameState);
+		this.draw(polys, numPolys, 1, 0, 0, 1);
 
 		//FPS BAR
 		polys = [];
