@@ -88,9 +88,9 @@ Drones.prototype.update = function(secs) {
 					drone.acc.x = 0;
 					drone.acc.y = 0;
 
-					drone.vel = pursue(target, drone, ship.vel.length() + 100, 100);
+					drone.vel = pursue(target, drone, 100, 100);
 
-					if (ship.pos.subtract(drone.pos).length() < this.droneRange && drone.bulletTimer >= 2) {
+					if (ship.pos.subtract(drone.pos).length() < this.droneRange && drone.bulletTimer >= 0.75) {
 						var bulletSpeed = 6;
 
 						var newBullet = new Bullet();
@@ -175,9 +175,10 @@ function pursue(target, subject, maxVel, breakingDistance) {
 
 	if (distance < 5) { // match speed if close enough
 		result = direction.normalize(target.vel.length());
-	} else if (distance < 50) { // start to decrease speed
+		/*} else if (distance < 50) { // start to decrease speed
 		var targetSpeed = target.vel.length();
 		result = direction.normalize(((maxVel - targetSpeed) * direction.length() / 50) + targetSpeed);
+		*/
 	} else {
 		result = direction.normalize(maxVel);
 	}
