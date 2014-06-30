@@ -26,6 +26,8 @@ Drones.prototype.update = function(secs) {
 
 		var j;
 
+		ship.pos.x %= this.SW;
+		ship.pos.y %= this.SH;
 		var targets = this.getTargetsInRange(ship.pos, this.droneRange, ship.id);
 
 		var numTargets = targets.length;
@@ -113,6 +115,8 @@ Drones.prototype.update = function(secs) {
 
 				drone.rot = this.radiansToDegrees(Math.atan2(drone.vel.y, drone.vel.x));
 
+				drone.pos.x %= this.SW;
+				drone.pos.y %= this.SH;
 				this.applyNewPositions(drone, drone.acc, secs);
 				drone.pos.x %= this.SW;
 				drone.pos.y %= this.SH;
@@ -139,6 +143,8 @@ Drones.prototype.update = function(secs) {
 
 				drone.rot = this.radiansToDegrees(Math.atan2(drone.vel.y, drone.vel.x));
 
+				drone.pos.x %= this.SW;
+				drone.pos.y %= this.SH;
 				this.applyNewPositions(drone, drone.acc, secs);
 				drone.pos.x %= this.SW;
 				drone.pos.y %= this.SH;
