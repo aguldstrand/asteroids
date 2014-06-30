@@ -109,6 +109,8 @@ define([
 				focusPoint.y = gameState.SH - this.SH;
 			}
 		}
+
+
 		Poly.setFocusPoint(focusPoint);
 
 		//CLEAR
@@ -118,7 +120,7 @@ define([
 
 		//STARMAP
 		polys = [];
-		numPolys = this.starmap.update(step, polys);
+		numPolys = this.starmap.update(step, polys, focusPoint);
 		this.draw(polys, numPolys, 1, 1, 0, 1);
 
 		//EXPLOSIONS

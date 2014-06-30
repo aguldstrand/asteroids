@@ -185,9 +185,9 @@ define(function() {
 			return 6;
 		} else {
 
-			var x1 = x;
+			var x1 = x + originX || 0;
 			var x2 = x1 + width;
-			var y1 = y;
+			var y1 = y + originY || 0;
 			var y2 = y1 + height;
 
 

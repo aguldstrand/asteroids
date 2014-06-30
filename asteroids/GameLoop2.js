@@ -100,7 +100,7 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
 
 	if (numAsteroids === 0) {
-		this.asteroids.createAsteroids(32);
+		this.asteroids.createAsteroids(120);
 	}
 
 

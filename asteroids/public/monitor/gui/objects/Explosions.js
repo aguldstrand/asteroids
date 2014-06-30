@@ -97,7 +97,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			numPolys += Poly.add(pp.p.x, pp.p.y, pixel, pixel, polys, false, Poly.TL);
 
 
-			if (pp.life < 0 || pp.p.y > this.SH) {
+			if (pp.life < 0) {
 				ppLen--;
 				this.pixelPoints.splice(p, 1);
 			}
