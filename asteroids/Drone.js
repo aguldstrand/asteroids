@@ -5,6 +5,7 @@ function Drone() {
 
 	this.rot = 0;
 	this.maxVel = 1500;
+	this.bulletTimer = 0;
 }
 
 Drone.prototype = new BasePhysics();

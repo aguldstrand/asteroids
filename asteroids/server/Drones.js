@@ -88,9 +88,9 @@ Drones.prototype.update = function(secs) {
 					drone.acc.x = 0;
 					drone.acc.y = 0;
 
-					drone.vel = follow(target, drone, ship.vel.length() + 100, 100);
+					drone.vel = pursue(target, drone, ship.vel.length() + 100, 100);
 
-					if (target.pos.subtract(drone.pos)) {
+					if (ship.pos.subtract(drone.pos).length() < this.droneRange && drone.bulletTimer >= 2) {
 						var bulletSpeed = 6;
 
 						var newBullet = new Bullet();
@@ -105,13 +105,18 @@ Drones.prototype.update = function(secs) {
 						newBullet.maxVel = 500;
 						newBullet.friction = 0;
 						ship.bullets.push(newBullet);
+						drone.bulletTimer = 0;
 					}
+					drone.bulletTimer += secs;
 				}
 
 
 				drone.rot = this.radiansToDegrees(Math.atan2(drone.vel.y, drone.vel.x));
 
 				this.applyNewPositions(drone, drone.acc, secs);
+				drone.pos.x %= this.SW;
+				drone.pos.y %= this.SH;
+
 			}
 		} else {
 
@@ -135,6 +140,8 @@ Drones.prototype.update = function(secs) {
 				drone.rot = this.radiansToDegrees(Math.atan2(drone.vel.y, drone.vel.x));
 
 				this.applyNewPositions(drone, drone.acc, secs);
+				drone.pos.x %= this.SW;
+				drone.pos.y %= this.SH;
 			}
 		}
 	}
@@ -142,6 +149,25 @@ Drones.prototype.update = function(secs) {
 
 function follow(target, subject, maxVel, breakingDistance) {
 	var dest = target.pos.add(target.vel.multiply(-1).normalize(100)); // 100px behind the target
+	var direction = dest.subtract(subject.pos);
+	var distance = direction.length();
+
+	var result;
+
+	if (distance < 5) { // match speed if close enough
+		result = direction.normalize(target.vel.length());
+	} else if (distance < 50) { // start to decrease speed
+		var targetSpeed = target.vel.length();
+		result = direction.normalize(((maxVel - targetSpeed) * direction.length() / 50) + targetSpeed);
+	} else {
+		result = direction.normalize(maxVel);
+	}
+
+	return result;
+}
+
+function pursue(target, subject, maxVel, breakingDistance) {
+	var dest = target.pos.add(target.vel.normalize(100)); // 100px behind the target
 	var direction = dest.subtract(subject.pos);
 	var distance = direction.length();
 
