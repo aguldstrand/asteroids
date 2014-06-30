@@ -37,7 +37,8 @@ define([
 
 	ScreenComponent.prototype.setup = function() {
 
-		this.starmap = new Starmap(this.pixel, this.SW, this.SH);
+		this.starmap1 = new Starmap(this.pixel, this.SW, this.SH, 2, -0.4);
+		this.starmap2 = new Starmap(this.pixel, this.SW, this.SH, 4, -0.6);
 		this.explosions = new Explosions(this.pixel, this.SW, this.SH);
 		this.ships = new Ships(this.pixel, this.SW, this.SH);
 		this.asteroids = new Asteroids(this.pixel, this.SW, this.SH);
@@ -123,7 +124,11 @@ define([
 
 		//STARMAP
 		polys = [];
-		numPolys = this.starmap.update(step, polys, focusPoint);
+		numPolys = this.starmap1.update(step, polys, focusPoint);
+		this.draw(polys, numPolys, 1, 1, 0, 1);
+
+		polys = [];
+		numPolys = this.starmap2.update(step, polys, focusPoint);
 		this.draw(polys, numPolys, 1, 1, 0, 1);
 
 		//EXPLOSIONS
