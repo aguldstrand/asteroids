@@ -89,7 +89,7 @@ Point.interpolate = function(pt1, pt2, f) {
 };
 
 Point.polar = function(len, angle) {
-	return new Point(len * Math.sin(angle), len * Math.cos(angle));
+	return new Point(len * Math.cos(angle), len * Math.sin(angle));
 };
 
 Point.distance = function(pt1, pt2) {
@@ -99,9 +99,7 @@ Point.distance = function(pt1, pt2) {
 };
 
 Point.prototype.dot = function(v) {
-
 	return this.x * v.x + this.y * v.y;
-
 };
 
 Point.prototype.rotate = function(angle) {

@@ -241,8 +241,7 @@ function getSlotSectors(slotCount, origin, radius) {
 
 function pursueBehaviour(slotCount, avoid, follow, target, subject, maxVel, breakingDistance) {
 
-	var dest = target.pos; // 100px behind the target
-	var direction = dest.subtract(subject.pos);
+	var direction = subject.pos.subtract(target.pos);
 	var distance = direction.length();
 
 	var amount;
@@ -255,11 +254,13 @@ function pursueBehaviour(slotCount, avoid, follow, target, subject, maxVel, brea
 
 	var slot = ((Math.atan2(direction.y, direction.x) + Math.PI) / (Math.PI * 2) * slotCount) | 0;
 
+	console.log((Math.atan2(direction.y, direction.x) + Math.PI) / (Math.PI * 2) * 360);
+
 	follow[slot] = amount;
 }
 
 function mergeContexts(behaviours) {
-	var slots = 16;
+	var slots = 32;
 	var slotIndex;
 
 	var avoidResult = [];
@@ -295,8 +296,6 @@ function mergeContexts(behaviours) {
 
 		return followResult[y] - followResult[x];
 	});
-
-	console.log(result);
 
 	console.log((result[0] / slots) * 360);
 	return Point.polar(followResult[result[0]], (result[0] / slots) * Math.PI * 2);
