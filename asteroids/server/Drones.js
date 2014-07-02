@@ -82,6 +82,7 @@ Drones.prototype.update = function(secs) {
 				}
 
 				if (target) {
+
 					// Target selected!
 					drone.pos.x = drone.pos.x || ship.pos.x + 10;
 					drone.pos.y = drone.pos.y || ship.pos.y + 10;
@@ -90,7 +91,12 @@ Drones.prototype.update = function(secs) {
 					drone.acc.x = 0;
 					drone.acc.y = 0;
 
-					drone.vel = pursue(target, drone, 100, 100);
+					drone.vel = mergeContexts([
+
+						function(slots, avoid, follow) {
+							pursueBehaviour(slots, avoid, follow, ship, drone, 100, 100);
+						}
+					]);
 
 					if (ship.pos.subtract(drone.pos).length() < this.droneRange && drone.bulletTimer >= 0.75) {
 						var bulletSpeed = 6;
@@ -123,7 +129,6 @@ Drones.prototype.update = function(secs) {
 
 			}
 		} else {
-
 			// No targets found, follow the ship
 			// How to do this?
 
@@ -139,7 +144,14 @@ Drones.prototype.update = function(secs) {
 				drone.acc.x = 0;
 				drone.acc.y = 0;
 
-				drone.vel = follow(ship, drone, ship.vel.length() + 100, 100);
+				// drone.vel = follow(ship, drone, ship.vel.length() + 100, 100);
+				drone.vel = mergeContexts([
+
+					function(slots, avoid, follow) {
+						pursueBehaviour(slots, avoid, follow, ship, drone, 100, 100);
+					}
+				]);
+
 
 				drone.rot = this.radiansToDegrees(Math.atan2(drone.vel.y, drone.vel.x));
 
@@ -190,6 +202,104 @@ function pursue(target, subject, maxVel, breakingDistance) {
 	}
 
 	return result;
+}
+
+
+
+function followBehaviour(slots, avoid, follow, target, subject, maxVel, breakingDistance) {
+	var dest = target.pos.add(target.vel.multiply(-1).normalize(100)); // 100px behind the target
+	var direction = dest.subtract(subject.pos);
+	var distance = direction.length();
+
+	var result;
+
+	if (distance < 5) { // match speed if close enough
+		result = direction.normalize(target.vel.length());
+	} else if (distance < 50) { // start to decrease speed
+		var targetSpeed = target.vel.length();
+		result = direction.normalize(((maxVel - targetSpeed) * direction.length() / 50) + targetSpeed);
+	} else {
+		result = direction.normalize(maxVel);
+	}
+
+	return result;
+}
+
+function getSlotSectors(slotCount, origin, radius) {
+	var slotSectors = [];
+	var sectorAngle = Math.PI * 2 / slotCount;
+	for (var i = 0; i < slotCount; i++) {
+		slotSectors.push([
+			origin,
+			new Point(0, radius).rotate(-sectorAngle * 0.5 + sectorAngle * 1),
+			new Point(0, radius).rotate(-sectorAngle * 0.5 + sectorAngle * (i + 1))
+		]);
+	}
+
+	return slotSectors;
+}
+
+function pursueBehaviour(slotCount, avoid, follow, target, subject, maxVel, breakingDistance) {
+
+	var dest = target.pos; // 100px behind the target
+	var direction = dest.subtract(subject.pos);
+	var distance = direction.length();
+
+	var amount;
+
+	if (distance < 100) { // match speed if close enough
+		amount = target.vel.length();
+	} else {
+		amount = maxVel;
+	}
+
+	var slot = ((Math.atan2(direction.y, direction.x) + Math.PI) / (Math.PI * 2) * slotCount) | 0;
+
+	follow[slot] = amount;
+}
+
+function mergeContexts(behaviours) {
+	var slots = 16;
+	var slotIndex;
+
+	var avoidResult = [];
+	var followResult = [];
+
+	var avoid = [];
+	var follow = [];
+
+	var numBehaviours = behaviours.length;
+	for (var i = 0; i < numBehaviours; i++) {
+		behaviours[i](slots, avoid, follow);
+
+		for (slotIndex = 0; slotIndex < slots; slotIndex++) {
+			avoidResult[slotIndex] = Math.max(avoidResult[slotIndex] || 0, avoid[slotIndex] || 0);
+			followResult[slotIndex] = Math.max(followResult[slotIndex] || 0, follow[slotIndex] || 0);
+		}
+
+		avoid.length = 0;;
+		follow.length = 0;
+	}
+
+	var result = [];
+	for (slotIndex = 0; slotIndex < slots; slotIndex++) {
+		result.push(slotIndex);
+	}
+
+	// Find the slot with the lowest avoid and highest follow value
+	result.sort(function(x, y) {
+		var val = avoidResult[x] - avoidResult[y];
+		if (val !== 0) {
+			//return val;
+		}
+
+		return followResult[y] - followResult[x];
+	});
+
+	console.log(result);
+
+	console.log((result[0] / slots) * 360);
+	return Point.polar(followResult[result[0]], (result[0] / slots) * Math.PI * 2);
 }
 
 module.exports = Drones;
