@@ -148,7 +148,7 @@ Drones.prototype.update = function(secs) {
 				drone.vel = mergeContexts([
 
 					function(slots, avoid, follow) {
-						pursueBehaviour(slots, avoid, follow, ship, drone, 100, 100);
+						followBehaviour(slots, avoid, follow, ship, drone, 100, 100);
 					}
 				]);
 
@@ -165,64 +165,25 @@ Drones.prototype.update = function(secs) {
 	}
 };
 
-function follow(target, subject, maxVel, breakingDistance) {
+function followBehaviour(slotCount, avoid, follow, target, subject, maxVel, breakingDistance) {
+	console.log('followBehaviour');
+
 	var dest = target.pos.add(target.vel.multiply(-1).normalize(100)); // 100px behind the target
-	var direction = dest.subtract(subject.pos);
+
+	var direction = subject.pos.subtract(dest);
 	var distance = direction.length();
 
-	var result;
+	var amount;
 
-	if (distance < 5) { // match speed if close enough
-		result = direction.normalize(target.vel.length());
-	} else if (distance < 50) { // start to decrease speed
-		var targetSpeed = target.vel.length();
-		result = direction.normalize(((maxVel - targetSpeed) * direction.length() / 50) + targetSpeed);
+	if (distance < 100) { // match speed if close enough
+		amount = target.vel.length();
 	} else {
-		result = direction.normalize(maxVel);
+		amount = maxVel;
 	}
 
-	return result;
-}
+	var slot = ((Math.atan2(direction.y, direction.x) + Math.PI) / (Math.PI * 2) * slotCount) | 0;
 
-function pursue(target, subject, maxVel, breakingDistance) {
-	var dest = target.pos.add(target.vel.normalize(100)); // 100px behind the target
-	var direction = dest.subtract(subject.pos);
-	var distance = direction.length();
-
-	var result;
-
-	if (distance < 5) { // match speed if close enough
-		result = direction.normalize(target.vel.length());
-		/*} else if (distance < 50) { // start to decrease speed
-		var targetSpeed = target.vel.length();
-		result = direction.normalize(((maxVel - targetSpeed) * direction.length() / 50) + targetSpeed);
-		*/
-	} else {
-		result = direction.normalize(maxVel);
-	}
-
-	return result;
-}
-
-
-
-function followBehaviour(slots, avoid, follow, target, subject, maxVel, breakingDistance) {
-	var dest = target.pos.add(target.vel.multiply(-1).normalize(100)); // 100px behind the target
-	var direction = dest.subtract(subject.pos);
-	var distance = direction.length();
-
-	var result;
-
-	if (distance < 5) { // match speed if close enough
-		result = direction.normalize(target.vel.length());
-	} else if (distance < 50) { // start to decrease speed
-		var targetSpeed = target.vel.length();
-		result = direction.normalize(((maxVel - targetSpeed) * direction.length() / 50) + targetSpeed);
-	} else {
-		result = direction.normalize(maxVel);
-	}
-
-	return result;
+	follow[slot] = amount;
 }
 
 function getSlotSectors(slotCount, origin, radius) {
@@ -240,6 +201,7 @@ function getSlotSectors(slotCount, origin, radius) {
 }
 
 function pursueBehaviour(slotCount, avoid, follow, target, subject, maxVel, breakingDistance) {
+	console.log('pursueBehaviour');
 
 	var direction = subject.pos.subtract(target.pos);
 	var distance = direction.length();
@@ -253,8 +215,6 @@ function pursueBehaviour(slotCount, avoid, follow, target, subject, maxVel, brea
 	}
 
 	var slot = ((Math.atan2(direction.y, direction.x) + Math.PI) / (Math.PI * 2) * slotCount) | 0;
-
-	console.log((Math.atan2(direction.y, direction.x) + Math.PI) / (Math.PI * 2) * 360);
 
 	follow[slot] = amount;
 }
@@ -297,7 +257,6 @@ function mergeContexts(behaviours) {
 		return followResult[y] - followResult[x];
 	});
 
-	console.log((result[0] / slots) * 360);
 	return Point.polar(followResult[result[0]], (result[0] / slots) * Math.PI * 2);
 }
 
