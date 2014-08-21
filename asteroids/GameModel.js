@@ -2,7 +2,6 @@ function GameModel() {
 	this.userInputs = {};
 
 	this.ships = [];
-	this.bullets = [];
 	this.asteroids = [];
 	this.explosions = [];
 

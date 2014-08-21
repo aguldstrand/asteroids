@@ -23,7 +23,7 @@ BasePhysics.prototype.init = function(parentObject) {
 };
 
 
-BasePhysics.prototype.handleCollision = function() {
+BasePhysics.prototype.handleCollision = function(other) {
 	this.alive = false;
 	return false;
 };

@@ -42,6 +42,12 @@ Ships.prototype.update = function(secs) {
 	// MOVE SHIPS (BASED ON USER INPUT)			
 	for (var s = 0; s < numShips; s++) {
 		var ship = this.gameModel.ships[s];
+
+		if(!ship.alive){
+			ship.reset();
+			continue;
+		}
+
 		var shipAcc = new Point(0, 0);
 		var userInput = this.gameModel.userInputs[ship.id];
 
@@ -188,7 +194,7 @@ Ships.prototype.update = function(secs) {
 		//ship.pos.y += ship.vel.y*secs + g.y;
 
 
-
+		/*
 		for (var mb = 0; mb < numBulletsInShip; mb++) {
 			var bullet = ship.bullets[mb];
 
@@ -232,7 +238,7 @@ Ships.prototype.update = function(secs) {
 				//bullet.pos.y -= Math.cos(bullet.direction * piOver180 ) * bulletSpeed * secs - gb.y;	
 			}
 			//
-		}
+		}*/
 
 
 

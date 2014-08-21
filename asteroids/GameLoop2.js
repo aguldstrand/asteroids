@@ -7,9 +7,10 @@ var Asteroids = require('./server/Asteroids');
 var Ships = require('./server/Ships');
 var Explosions = require('./server/Explosions');
 var Gravity = require('./server/Gravity');
-var Bullets = require('./server/Bullets');
+//var Bullets = require('./server/Bullets');
 var Drones = require('./server/Drones');
-var Rockets = require('./server/Rockets');
+//var Rockets = require('./server/Rockets');
+var Projectiles = require('./server/Projectiles');
 
 function GameLoop(options) {
 	this.gameModel = options.gameModel;
@@ -73,9 +74,10 @@ GameLoop.prototype.init = function() {
 	this.ships = new Ships(options);
 	this.explosions = new Explosions(options);
 	this.gravity = new Gravity(options);
-	this.bullets = new Bullets(options);
+	//this.bullets = new Bullets(options);
 	this.drones = new Drones(options);
-	this.rockets = new Rockets(options);
+	this.rockets = new Projectiles(options,'rockets');
+	this.bullets = new Projectiles(options,'bullets');
 };
 
 GameLoop.prototype.degreesToRadians = function(degrees) {
@@ -121,6 +123,7 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 	//this.ships.log('post bullets');
 	this.drones.update(secs);
 	//this.ships.log('post drones');
+	this.rockets.update(secs);
 
 
 };

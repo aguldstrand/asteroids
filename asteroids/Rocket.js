@@ -3,12 +3,12 @@ var Point = require("./Point");
 
 function Rocket(parentObject) {
 	this.startVel = 50;
-	this.maxVel = 100;
+	this.maxVel = 700;
 	this.diam = 0;
 	this.rot = 0;
-	this.scanRadius = 100;
+	this.scanRadius = 1000;
 
-	this.target = null;
+	this.targetId = null;
 
 	BasePhysics.apply(this);
 

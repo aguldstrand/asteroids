@@ -1,39 +1,56 @@
 var Base = require('./Base');
+var Point = require('../Point');
 
-function RocketManager(options) {
+function Rockets(options) {
 
 
 	Base.call(this, options);
 }
 
-RocketManager.prototype = new Base();
+Rockets.prototype = new Base();
 
-RocketManager.prototype.update = function(secs) {
+Rockets.prototype.update = function(secs) {
 	
 	var ships = this.gameModel.ships;
 	var asteroids = this.gameModel.asteroids;
 
-	for (var shipIndex = ships.length; shipIndex >= 0; shipIndex--) {
+	for (var shipIndex = ships.length; shipIndex--; ) {
 
-		var ship = ships[i];
+		var ship = ships[shipIndex];
 		var rockets = ship.rockets;
 
-		for (var rocketIndex = rockets.length; rocketIndex >= 0; rocketIndex--) {
+		for (var rocketIndex = rockets.length; rocketIndex--; ) {
 
 			var rocket = rockets[rocketIndex];
 
-			var target = rocket.target;
-			if (!target) {
-				var targets = this.getTargetsInRange(rocket.pos, rocket.scanRadius, ship.id);
-				target = rocket.target = targets[0];
+			var targetId = rocket.targetId;
+			if (!targetId) {
+				var targets = this.getTargetsInRange(rocket.pos, rocket.scanRadius, ship.id, true);
+				targetId = rocket.targetId = (targets[0] || {}).id;
 			}
 
 			var direction = new Point();
-			if (target) {
-				direction = target.pos.subtract(rocket.pos);
+			if (targetId) {
+
+				var target;
+				for (var i = 0; i < ships.length; i++) {
+					if (ships[i].id === targetId) {
+						target = ships[i];
+						break;
+					}
+				}
+
+				if (target) {
+					direction = target.pos.subtract(rocket.pos);
+				}
 			}
-			
+
 			this.applyNewPositions(rocket, direction, secs);
+
+			if (rocket.pos.x >= this.SW || rocket.pos.x < 0 || rocket.pos.y < 0 || rocket.pos.y >= this.SH) {
+				ship.rockets.splice(rocketIndex, 1);
+				continue;
+			}
 
 
 			if (this.checkCollisions(rockets, rocketIndex, ships, shipIndex)) {
@@ -48,4 +65,4 @@ RocketManager.prototype.update = function(secs) {
 
 };
 
-module.exports = RocketManager;
+module.exports = Rockets;

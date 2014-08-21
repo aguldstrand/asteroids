@@ -158,7 +158,11 @@ Drones.prototype.update = function(secs) {
 				if (drone.pos.y < 0) {
 					drone.pos.y = this.SH - 1;
 				}
+				try{
 				this.applyNewPositions(drone, drone.acc, secs);
+			}catch(e){
+				console.log(drone);
+			}
 				drone.pos.x %= this.SW;
 				drone.pos.y %= this.SH;
 			}

@@ -27,6 +27,8 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	var g = this.getGravity(obj.pos);
 
+	
+
 	obj.acc.x = g.x + acc.x;
 	obj.acc.y = g.y + acc.y;
 
@@ -155,7 +157,7 @@ Base.prototype.rotate = function(p, origin, angle) {
 	);
 };
 
-Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
+Base.prototype.getTargetsInRange = function(pos, radius, playerId, onlyShips) {
 
 	// This should be optimised with a lookup grid or quad tree or similar
 
@@ -189,42 +191,53 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 		}
 
 
-		// Find drones
-		var drones = ship.drones;
-		var numDrones = drones.length;
-		for (j = 0; j < numDrones; j++) {
-			var drone = drones[i];
-			var dronePos = drone.pos;
+		if (!onlyShips) {
 
-			dx = pos.x - dronePos.x;
-			dy = pos.y - dronePos.y;
-			distanceSquared = dx * dx + dy * dy;
+			// Find drones
+			var drones = ship.drones;
+			var numDrones = drones.length;
+			for (j = 0; j < numDrones; j++) {
+				var drone = drones[i];
+				if (!drone) {
+					continue;
+				}
 
-			if (radiusSquared >= distanceSquared) {
-				drone.distance = Math.sqrt(distanceSquared);
-				targets.push(drone);
+				var dronePos = drone.pos;
+
+				dx = pos.x - dronePos.x;
+				dy = pos.y - dronePos.y;
+				distanceSquared = dx * dx + dy * dy;
+
+				if (radiusSquared >= distanceSquared) {
+					drone.distance = Math.sqrt(distanceSquared);
+					targets.push(drone);
+				}
+
 			}
 
 		}
 	}
 
-	// Find asteroids
-	var asteroids = this.gameModel.asteroids;
-	var numAsteroids = asteroids.length;
-	for (var i = 0; i < numAsteroids; i++) {
-		var asteroid = asteroids[i];
 
-		var asteroidPos = asteroid.pos;
+	if (!onlyShips) {
+		// Find asteroids
+		var asteroids = this.gameModel.asteroids;
+		var numAsteroids = asteroids.length;
+		for (var i = 0; i < numAsteroids; i++) {
+			var asteroid = asteroids[i];
 
-		var dx = pos.x - asteroidPos.x;
-		var dy = pos.y - asteroidPos.y;
-		var distanceSquared = dx * dx + dy * dy;
+			var asteroidPos = asteroid.pos;
 
-		if (radiusSquared >= distanceSquared) {
-			asteroid.distance = Math.sqrt(distanceSquared);
-			targets.push(asteroid);
+			var dx = pos.x - asteroidPos.x;
+			var dy = pos.y - asteroidPos.y;
+			var distanceSquared = dx * dx + dy * dy;
+
+			if (radiusSquared >= distanceSquared) {
+				asteroid.distance = Math.sqrt(distanceSquared);
+				targets.push(asteroid);
+			}
+
 		}
-
 	}
 
 	return targets;
@@ -236,7 +249,7 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 Base.prototype.checkCollisions = function(sourceList, sourceIndex, targetList, excludeTargetIndex) {
 	var source = sourceList[sourceIndex];
 
-	for (var i = targetList.length; i >= 0; i--) {
+	for (var i = targetList.length; i--; ) {
 		if (i === excludeTargetIndex) {
 			continue;
 		}

@@ -146,7 +146,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, polys, 1);
 			numPolys += Poly.addR(ship.pos.x, ship.pos.y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, polys, 1);
 
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, 0, 0, 2, 2, ship.vel.x, ship.vel.y, polys, 1);
+			//numPolys += Poly.addR(ship.pos.x, ship.pos.y, 0, 0, 2, 2, ship.vel.x, ship.vel.y, polys, 1);
 
 			var j;
 
@@ -179,7 +179,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				var droneN = this.rotate_point(this.droneN, drone.rot);
 				numPolys += Poly.addR(drone.pos.x, drone.pos.y, droneLW.x, droneLW.y, droneRW.x, droneRW.y, droneN.x, droneN.y, polys, 1);
 
-				numPolys += Poly.addR(drone.pos.x, drone.pos.y, 0, 0, 2, 2, drone.vel.x, drone.vel.y, polys, 1);
+				//numPolys += Poly.addR(drone.pos.x, drone.pos.y, 0, 0, 2, 2, drone.vel.x, drone.vel.y, polys, 1);
 			}
 
 
@@ -190,6 +190,13 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				numPolys += Poly.addR(bullet.pos.x, bullet.pos.y, 0, 0, 2, 2, bullet.vel.x * 0.1, bullet.vel.y * 0.1, polys, 1);
 				//numPolys += Poly.add(bullet.pos.x, bullet.pos.y, 20, 20, polys);
 				//window.tracker.outFixed('bullet' + b, bullet.vel.x + ':' + bullet.vel.y);
+			}
+
+			//BULLETS
+			var numRockets = ship.rockets.length;
+			for (b = 0; b < numRockets; b++) {
+				var rocket = ship.rockets[b];
+				numPolys += Poly.addR(rocket.pos.x, rocket.pos.y, -3, -3, 2, 2, rocket.vel.x * 0.1, rocket.vel.y * 0.1, polys, 1);
 			}
 		}
 
