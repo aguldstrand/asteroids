@@ -18,6 +18,14 @@ function Ships(options) {
 
 Ships.prototype = new Base();
 
+Ships.prototype.log = function(msg) {
+	var numShips = this.gameModel.ships.length;
+	for (var s = 0; s < numShips; s++) {
+		var ship = this.gameModel.ships[s];
+		console.log(msg, ship.pos.x, ship.acc.x, ship.vel.x);
+	}
+};
+
 Ships.prototype.update = function(secs) {
 
 	var numShips = this.gameModel.ships.length;
