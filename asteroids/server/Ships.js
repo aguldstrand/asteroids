@@ -2,6 +2,7 @@ var Base = require('./Base');
 var Point = require('../Point');
 var Asteroid = require('../Asteroid');
 var Bullet = require('../Bullet');
+var Rocket = require('../Rocket');
 
 
 function Ships(options) {
@@ -88,6 +89,18 @@ Ships.prototype.update = function(secs) {
 			ship.bullets.push(newBullet);
 			ship.bulletTimer = 0;
 		}
+
+		//////////////
+		// Rocket //
+		//////////////
+		if (userInput.ctrl && ship.bulletTimer >= 1.0) {
+			var rocket = new Rocket(ship);
+
+			ship.rockets.push(rocket);
+			ship.bulletTimer = 0;
+		}
+
+
 		ship.bulletTimer += secs;
 
 		ship.pos.x %= this.SW;
@@ -234,9 +247,9 @@ Ships.prototype.update = function(secs) {
 	Ships.prototype.resetShip = function(ship, collidable) {
 		var diam = collidable.diam || 200;
 		var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
-		this.createExplosion(diam, explosionOrigin);
+		this.createExplosion(diam * 5, explosionOrigin);
 
-		ship.pos = new Point(this.SW * 0.5, this.SH * 0.5);
+		ship.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
 		ship.shieldStarter = 64;
 	};
 };
