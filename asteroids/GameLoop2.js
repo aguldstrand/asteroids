@@ -106,13 +106,20 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
 	var secs = step / 1000;
 
-
+	//this.ships.log('before');
 	this.asteroids.update(secs);
+	//this.ships.log('post asteroids');
 	this.ships.update(secs);
+	//this.ships.log('post ships');
 	this.explosions.update(secs);
+	//this.ships.log('post explosions');
 	this.gravity.update(secs);
+	//this.ships.log('post gravity');
 	this.bullets.update(secs);
+	//this.ships.log('post bullets');
 	this.drones.update(secs);
+	//this.ships.log('post drones');
+
 
 };
 
@@ -152,6 +159,9 @@ GameLoop.prototype.addPlayer = function(id, options) {
 	ship.pos.y = this.SH * 0.5;
 	this.gameModel.ships.push(ship);
 	this.gameModel.userInputs[id] = {};
+	console.log('________________________');
+	console.log('player added', ship);
+	console.log('________________________');
 };
 
 GameLoop.prototype.removePlayer = function(id) {

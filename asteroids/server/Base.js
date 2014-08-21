@@ -28,7 +28,7 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 	var g = this.getGravity(obj.pos);
 
 	if (!g) {
-		console.log(obj.pos);
+		console.log(obj.pos, obj.acc, obj.vel);
 	}
 
 	obj.acc.x = g.x + acc.x;
@@ -37,6 +37,9 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	if (obj.vel.length() > 0.1) {
 		var frictionP = new Point(-obj.vel.x, -obj.vel.y);
+
+
+
 		frictionP.normalize(obj.friction);
 		obj.acc.x += frictionP.x;
 		obj.acc.y += frictionP.y;
