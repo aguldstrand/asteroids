@@ -14,11 +14,12 @@ Point.prototype.length = function() {
 Point.prototype.normalize = function(len) {
 	//console.log('normalize A', len, this.x, this.y);
 	var mag = Math.sqrt(this.x * this.x + this.y * this.y);
-	if (mag === 0) {
-		return this;
+	if (mag !== 0) {
+		this.x = this.x / mag;
+		this.y = this.y / mag;
 	}
-	this.x = this.x / mag * len;
-	this.y = this.y / mag * len;
+	this.x *= len;
+	this.y *= len;
 	//console.log('normalize B', len, this.x, this.y, mag);
 	return this;
 };
