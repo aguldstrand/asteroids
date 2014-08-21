@@ -234,9 +234,9 @@ Ships.prototype.update = function(secs) {
 	Ships.prototype.resetShip = function(ship, collidable) {
 		var diam = collidable.diam || 200;
 		var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
-		this.createExplosion(diam * 5, explosionOrigin);
+		this.createExplosion(diam, explosionOrigin);
 
-		ship.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
+		ship.pos = new Point(this.SW * 0.5, this.SH * 0.5);
 		ship.shieldStarter = 64;
 	};
 };

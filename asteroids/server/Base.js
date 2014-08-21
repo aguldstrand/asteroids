@@ -27,6 +27,10 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	var g = this.getGravity(obj.pos);
 
+	if (!g) {
+		console.log(obj.pos);
+	}
+
 	obj.acc.x = g.x + acc.x;
 	obj.acc.y = g.y + acc.y;
 
@@ -76,8 +80,9 @@ Base.prototype.resolveCollision = function(ballA, ballB) {
 	var vn = v.dot(mtd.normalize());
 
 	// sphere intersecting but moving away from each other already
-	if (vn > 0)
+	if (vn > 0) {
 		return;
+	}
 
 	// collision impulse
 	var i = (-(1 + .1) * vn) / (im1 + im2);
@@ -194,6 +199,9 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 		var numDrones = drones.length;
 		for (j = 0; j < numDrones; j++) {
 			var drone = drones[i];
+			if (!drone) {
+				continue;
+			}
 			var dronePos = drone.pos;
 
 			dx = pos.x - dronePos.x;
