@@ -288,5 +288,47 @@ Base.prototype.checkCollisions = function(sourceList, sourceIndex, targetList, e
 
 
 
+Base.prototype.getClosestInRange = function(lists, pos, radius, excludes) {
+	var pow = Math.pow;
+	var radiusSq = radius * radius;
+
+	excludes = Util.isArray(excludes) ? excludes : [excludes];
+
+	function distSq(posA, posB) {
+		return pow(posA.x - posB.x, 2) + pow(posA.y - posB.y, 2);
+	}
+
+	function closest(list, pos, radius, excludes) {
+		var minDistance = Infinity;
+		var minObject = null;
+
+		for (var i = 0; i < lists.length; i++) {
+			var object = lists[i];
+			if (Util.isArray(object)) {
+				var res = this.getClosestInRange(object, pos, radius, excludes);
+				if (res && res.distance < minDistance) {
+					return res;
+				}
+			} else {
+				if (excludes.indexOf(object) || !object.pos) {
+					continue;
+				}
+
+				var dist = distSq(object.pos, pos);
+				if (dist < minDistance) {
+					minDistance = dist;
+					minObject = object;
+				}
+			}
+		}
+
+		return minObject;
+	}
+
+
+	return closest(lists, pos, radiusSq, excludes);
+};
+
+
 
 module.exports = Base;
