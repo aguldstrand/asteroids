@@ -116,6 +116,14 @@ define([
 
 
 		this.shipPolygon = WebGL.createPolygon(vertices);
+
+
+		var bulletVertices = [
+			0.0, 0.0,
+			1.0, 0.5,
+			0.0, 1.0
+		];
+		this.bulletPolygon = WebGL.createPolygon(bulletVertices);
 	};
 
 
@@ -267,12 +275,27 @@ define([
 			var pos = ship.pos;
 
 			WebGL.bindUniform(uniforms.u_color, ship.color);
+
 			gl.uniform2f(positionLocation, pos.x, pos.y);
 			gl.uniform1f(rotationLocation, ship.rot * DEG_TO_RAD);
 			gl.uniform1f(scaleLocation, 1.0);
 
 			gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+
+
+			WebGL.bindAttribBuffer(this.bulletPolygon.vertexBuffer, program.attributes.a_position, this.bulletPolygon.itemSize);
+			for (var j = ship.bullets.length; j--; ) {
+				var bullet = ship.bullets[j];
+
+				gl.uniform2f(positionLocation, bullet.pos.x, bullet.pos.y);
+				gl.uniform1f(rotationLocation, bullet.rot * DEG_TO_RAD);
+				gl.uniform1f(scaleLocation, 10.0);
+
+				gl.drawArrays(gl.TRIANGLES, 0, this.bulletPolygon.vertexCount);
+
+			}
 		}
+
 	};
 
 
