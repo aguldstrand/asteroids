@@ -72,6 +72,7 @@ define([
 
 		WebGL.bindAttribBuffer(polygon.vertexBuffer, program.attributes.a_position, polygon.itemSize);
 		WebGL.bindUniform(uniforms.u_color, this.color);
+		WebGL.bindUniform(uniforms.u_resolution, [WebGL.screenWidth, WebGL.screenHeight]);
 
 		var positionLocation = uniforms.u_position;
 		var rotationLocation = uniforms.u_rotation;
@@ -91,10 +92,45 @@ define([
 
 			gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
 		}
+	};
+
+	Asteroids.prototype.draw3d = function(program, camera, asteroids) {
+		var polygon = this.polygon;
+		var uniforms = program.uniforms;
+
+		WebGL.bindAttribBuffer(polygon.vertexBuffer, program.attributes.a_position, polygon.itemSize);
+
+		var DEG_TO_RAD = Math.PI / 180.0;
+
+		var position = vec3.create();
+		var world = mat4.create();
+		var rotate = mat4.create();
+		var translate = mat4.create();
+		var wvp = mat4.create();
 
 
+		var gl = WebGL.gl;
+		var vertexCount = polygon.vertexCount;
+		for (var i = asteroids.length; i--; ) {
+			var asteroid = asteroids[i];
+			var pos = asteroid.pos;
 
-		Util.drawRectangleColor(program, [0.0, 0.0], [400.0], [0, 255, 0, 1]);
+			vec3.set(position, pos.x, pos.y, 1);
+			
+			mat4.identity(world);
+			mat4.identity(wvp);
+
+			// mat4.rotateZ(rotate, rotate, asteroid.rot * DEG_TO_RAD);
+			mat4.translate(translate, translate, position);
+
+			// mat4.mul(world, translate, rotate);
+
+			mat4.multiply(wvp, translate, camera.viewProjection);
+
+			gl.uniformMatrix4fv(uniforms.u_wvp, false, wvp);
+
+			gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+		}
 	};
 
 

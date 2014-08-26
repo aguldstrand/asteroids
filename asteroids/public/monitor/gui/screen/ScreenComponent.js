@@ -1,5 +1,10 @@
 define([
 	'Bifrost',
+
+	'glmatrix',
+
+	'monitor/gui/objects/Camera',
+
 	'monitor/gui/objects/Poly',
 	'monitor/gui/objects/Starmap',
 	'monitor/gui/objects/Ships',
@@ -12,6 +17,11 @@ define([
 	'hektorskraffs/webgl'
 ], function(
 	Bifrost,
+
+	glmatrix,
+
+	Camera,
+
 	Poly,
 	Starmap,
 	Ships,
@@ -21,6 +31,13 @@ define([
 	Explosions,
 
 	WebGL) {
+
+
+	// define local imports
+	var mat4 = glmatrix.mat4;
+	var vec3 = glmatrix.vec3;
+
+
 
 	function ScreenComponent(options) {
 		if (options) {
@@ -46,6 +63,8 @@ define([
 		this.asteroids = new Asteroids(this.pixel, this.screenWidth, this.screenHeight);
 		this.debug = new Debug(this.pixel, this.screenWidth, this.screenHeight);
 		this.miniMap = new MiniMap(this.pixel, this.screenWidth, this.screenHeight);
+
+		this.camera = new Camera();
 	};
 
 
@@ -60,9 +79,8 @@ define([
 		window.gl = WebGL.gl;
 		this.gl = WebGL.gl;
 
-		WebGL.resize(canvas.width, canvas.height);
-
-		this.colorProgram = WebGL.loadProgram('monitor/gui/shaders/color.vert', 'monitor/gui/shaders/color.frag', ['a_position'], ['u_color', 'u_position', 'u_rotation', 'u_scale', 'u_resolution']);
+		this.colorProgram = WebGL.loadProgram('monitor/gui/shaders/color.vert', 'monitor/gui/shaders/color.frag', ['a_position'], ['u_color', 'u_position', 'u_rotation', 'u_scale', 'u_resolution', 'u_camera']);
+		// this.colorProgram = WebGL.loadProgram('monitor/gui/shaders/color_3d.vert', 'monitor/gui/shaders/color.frag', ['a_position'], ['u_color', 'u_wvp']);
 	};
 
 
@@ -89,25 +107,27 @@ define([
 				}
 			}
 			if (activeShip) {
-				focusPoint.x = activeShip.pos.x - this.SW * 0.5;
-				focusPoint.y = activeShip.pos.y - this.SH * 0.5;
+				focusPoint.x = activeShip.pos.x - this.screenWidth * 0.5;
+				focusPoint.y = activeShip.pos.y - this.screenHeight * 0.5;
 				if (focusPoint.x < 0) {
 					focusPoint.x = 0;
 				}
-				if (focusPoint.x > gameState.SW - this.SW) {
-					focusPoint.x = gameState.SW - this.SW;
+				if (focusPoint.x > gameState.SW - this.screenWidth) {
+					focusPoint.x = gameState.SW - this.screenWidth;
 				}
 				if (focusPoint.y < 0) {
 					focusPoint.y = 0;
 				}
-				if (focusPoint.y > gameState.SH - this.SH) {
-					focusPoint.y = gameState.SH - this.SH;
+				if (focusPoint.y > gameState.SH - this.screenHeight) {
+					focusPoint.y = gameState.SH - this.screenHeight;
 				}
 			}
 		}
 
 
 		Poly.setFocusPoint(focusPoint);
+
+		this.camera.setTargetPosition(focusPoint.x, focusPoint.y);
 
 		//CLEAR
 		/*polys = [];
@@ -172,11 +192,20 @@ define([
 			return;
 		}
 
+		var program = this.colorProgram;
+		var camera = this.camera;
+		var gameState = this.gameState;
+
+		this.camera.update();
+
 		WebGL.beginDraw([0.0, 0.0, 0.0, 1.0]);
 
 
-		this.asteroids.draw(this.colorProgram, this.gameState.asteroids);
-		this.ships.draw(this.colorProgram, this.gameState.ships);
+		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
+
+		this.asteroids.draw(program, gameState.asteroids);
+		this.ships.draw(program, gameState.ships);
+		// this.asteroids.draw3d(program, camera, gameState.asteroids);
 
 		/*var gl = this.gl;
 		var colorLocation = gl.getUniformLocation(window.program, 'u_color');
@@ -195,22 +224,28 @@ define([
 		var canvas = this.$el.find('canvas')[0];
 		this.canvas = canvas;
 
-		this.resize();
-
 		this.init();
 		this.setup();
+
+		this.resize();
 	};
 
 	ScreenComponent.prototype.resize = function() {
 		var canvas = this.canvas;
 
-		canvas.width = window.innerWidth;
-		canvas.height = window.innerHeight;
+		var width = window.innerWidth;
+		var height = window.innerHeight;
+
+		canvas.width = width;
+		canvas.height = height;
 
 		//this.pixel = (canvas.width + canvas.height) * 0.0025;
 
-		this.screenWidth = parseInt(canvas.width / this.pixel, 10);
-		this.screenHeight = parseInt(canvas.height / this.pixel, 10);
+		this.screenWidth = parseInt(width / this.pixel, 10);
+		this.screenHeight = parseInt(height / this.pixel, 10);
+
+		WebGL.resize(width, height);
+		this.camera.resize(width, height);
 	};
 
 	ScreenComponent.prototype.events = {
