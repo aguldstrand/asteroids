@@ -252,7 +252,7 @@ define([
 		var uniforms = program.uniforms;
 
 		WebGL.bindAttribBuffer(polygon.vertexBuffer, program.attributes.a_position, polygon.itemSize);
-		WebGL.bindUniform(uniforms.u_color, this.color);
+		// WebGL.bindUniform(uniforms.u_color, this.color);
 
 		var positionLocation = uniforms.u_position;
 		var rotationLocation = uniforms.u_rotation;
@@ -266,6 +266,7 @@ define([
 			var ship = ships[i];
 			var pos = ship.pos;
 
+			WebGL.bindUniform(uniforms.u_color, ship.color);
 			gl.uniform2f(positionLocation, pos.x, pos.y);
 			gl.uniform1f(rotationLocation, ship.rot * DEG_TO_RAD);
 			gl.uniform1f(scaleLocation, 1.0);

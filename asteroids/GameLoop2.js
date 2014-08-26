@@ -162,6 +162,7 @@ GameLoop.prototype.addPlayer = function(id, options) {
 	var ship = new Ship(id, options);
 	ship.pos.x = this.SW * 0.5;
 	ship.pos.y = this.SH * 0.5;
+	ship.color = this.getColor();
 	this.gameModel.ships.push(ship);
 	this.gameModel.userInputs[id] = {};
 	console.log('________________________');
@@ -179,6 +180,38 @@ GameLoop.prototype.removePlayer = function(id) {
 	}
 	this.gameModel.userInputs[id] = null;
 };
+
+
+GameLoop.prototype.getColor = (function() {
+		var colors = [];
+
+		return function() {
+			if (!colors.length) {
+				colors = [
+					[1,1,1,1], // white
+					[0,0.12156862765550613,0.24705882370471954,1], // navy
+					[0,0.45490196347236633,0.8509804010391235,1], // blue
+					[0.49803921580314636,0.8588235378265381,1,1], // aqua
+					[0.2235294133424759,0.800000011920929,0.800000011920929,1], // teal
+					[0.239215686917305,0.6000000238418579,0.43921568989753723,1], // olive
+					[0.18039216101169586,0.800000011920929,0.250980406999588,1], // green
+					[0.003921568859368563,1,0.43921568989753723,1], // lime
+					[1,0.8627451062202454,0,1], // yellow
+					[1,0.5215686559677124,0.10588235408067703,1], // orange
+					[1,0.2549019753932953,0.21176470816135406,1], // red
+					[0.5215686559677124,0.0784313753247261,0.29411765933036804,1], // maroon
+					[0.9411764740943909,0.07058823853731155,0.7450980544090271,1], // fuchsia
+					[0.6941176652908325,0.05098039284348488,0.7882353067398071,1], // purple
+					[0.8666666746139526,0.8666666746139526,0.8666666746139526,1], // silver
+					[0.6666666865348816,0.6666666865348816,0.6666666865348816,1], // gray
+					[0.06666667014360428,0.06666667014360428,0.06666667014360428,1] // black
+				];
+			}
+
+			var index = parseInt(Math.random() * colors.length, 10);
+			return colors.splice(index, 1)[0];
+		};
+}());
 
 GameLoop.prototype.userInput = function(id, input) {
 
