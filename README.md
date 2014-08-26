@@ -3,6 +3,9 @@
 ## Tips
 * Use nodemon to auto reload the server in development
 
+        npm install -g nodemon
+        nodemon app
+
 ## TODO
 
 ### Monitor

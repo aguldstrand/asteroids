@@ -14,5 +14,8 @@ function Asteroid() {
 }
 
 Asteroid.prototype = new BasePhysics();
-
+Asteroid.prototype.handleCollision = function(other) {
+	this.alive = false;
+	return true;
+};
 module.exports = Asteroid;

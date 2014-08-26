@@ -27,6 +27,8 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	var g = this.getGravity(obj.pos);
 
+	
+
 	obj.acc.x = g.x + acc.x;
 	obj.acc.y = g.y + acc.y;
 
@@ -155,7 +157,7 @@ Base.prototype.rotate = function(p, origin, angle) {
 	);
 };
 
-Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
+Base.prototype.getTargetsInRange = function(pos, radius, playerId, onlyShips) {
 
 	// This should be optimised with a lookup grid or quad tree or similar
 
@@ -189,45 +191,144 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId) {
 		}
 
 
-		// Find drones
-		var drones = ship.drones;
-		var numDrones = drones.length;
-		for (j = 0; j < numDrones; j++) {
-			var drone = drones[i];
-			var dronePos = drone.pos;
+		if (!onlyShips) {
 
-			dx = pos.x - dronePos.x;
-			dy = pos.y - dronePos.y;
-			distanceSquared = dx * dx + dy * dy;
+			// Find drones
+			var drones = ship.drones;
+			var numDrones = drones.length;
+			for (j = 0; j < numDrones; j++) {
+				var drone = drones[i];
+				if (!drone) {
+					continue;
+				}
 
-			if (radiusSquared >= distanceSquared) {
-				drone.distance = Math.sqrt(distanceSquared);
-				targets.push(drone);
+				var dronePos = drone.pos;
+
+				dx = pos.x - dronePos.x;
+				dy = pos.y - dronePos.y;
+				distanceSquared = dx * dx + dy * dy;
+
+				if (radiusSquared >= distanceSquared) {
+					drone.distance = Math.sqrt(distanceSquared);
+					targets.push(drone);
+				}
+
 			}
 
 		}
 	}
 
-	// Find asteroids
-	var asteroids = this.gameModel.asteroids;
-	var numAsteroids = asteroids.length;
-	for (var i = 0; i < numAsteroids; i++) {
-		var asteroid = asteroids[i];
 
-		var asteroidPos = asteroid.pos;
+	if (!onlyShips) {
+		// Find asteroids
+		var asteroids = this.gameModel.asteroids;
+		var numAsteroids = asteroids.length;
+		for (var i = 0; i < numAsteroids; i++) {
+			var asteroid = asteroids[i];
 
-		var dx = pos.x - asteroidPos.x;
-		var dy = pos.y - asteroidPos.y;
-		var distanceSquared = dx * dx + dy * dy;
+			var asteroidPos = asteroid.pos;
 
-		if (radiusSquared >= distanceSquared) {
-			asteroid.distance = Math.sqrt(distanceSquared);
-			targets.push(asteroid);
+			var dx = pos.x - asteroidPos.x;
+			var dy = pos.y - asteroidPos.y;
+			var distanceSquared = dx * dx + dy * dy;
+
+			if (radiusSquared >= distanceSquared) {
+				asteroid.distance = Math.sqrt(distanceSquared);
+				targets.push(asteroid);
+			}
+
 		}
-
 	}
 
 	return targets;
 };
+
+
+
+// Collision checks
+Base.prototype.checkCollisions = function(sourceList, sourceIndex, targetList, excludeTargetIndex) {
+	var source = sourceList[sourceIndex];
+
+	for (var i = targetList.length; i--; ) {
+		if (i === excludeTargetIndex) {
+			continue;
+		}
+
+		var target = targetList[i];
+
+		var dx = target.pos.x - source.pos.x;
+		var dy = target.pos.y - source.pos.y;
+		var radi = target.diam + source.diam;
+
+		var dist = (dx * dx + dy * dy) - (radi * radi);
+
+		if (dist < 10) {
+
+			if (target.handleCollision(source)) {
+				this.createExplosion(target.diam * 5, target.pos);
+			}
+
+			if (source.handleCollision(target)) {
+				this.createExplosion(source.diam * 5, source.pos);
+			}
+
+			if (!target.alive) {
+				targetList.splice(i, 1);
+			}
+
+			if (!source.alive) {
+				sourceList.splice(sourceIndex, 1);
+				return true; // 'source dead'
+			}
+		}
+	}
+
+	return false; // 'still alive'
+};
+
+
+
+Base.prototype.getClosestInRange = function(lists, pos, radius, excludes) {
+	var pow = Math.pow;
+	var radiusSq = radius * radius;
+
+	excludes = Util.isArray(excludes) ? excludes : [excludes];
+
+	function distSq(posA, posB) {
+		return pow(posA.x - posB.x, 2) + pow(posA.y - posB.y, 2);
+	}
+
+	function closest(list, pos, radius, excludes) {
+		var minDistance = Infinity;
+		var minObject = null;
+
+		for (var i = 0; i < lists.length; i++) {
+			var object = lists[i];
+			if (Util.isArray(object)) {
+				var res = this.getClosestInRange(object, pos, radius, excludes);
+				if (res && res.distance < minDistance) {
+					return res;
+				}
+			} else {
+				if (excludes.indexOf(object) || !object.pos) {
+					continue;
+				}
+
+				var dist = distSq(object.pos, pos);
+				if (dist < minDistance) {
+					minDistance = dist;
+					minObject = object;
+				}
+			}
+		}
+
+		return minObject;
+	}
+
+
+	return closest(lists, pos, radiusSq, excludes);
+};
+
+
 
 module.exports = Base;

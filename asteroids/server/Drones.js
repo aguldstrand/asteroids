@@ -117,6 +117,13 @@ Drones.prototype.update = function(secs) {
 
 				drone.pos.x %= this.SW;
 				drone.pos.y %= this.SH;
+
+				if (drone.pos.x < 0) {
+					drone.pos.x = this.SW - 1;
+				}
+				if (drone.pos.y < 0) {
+					drone.pos.y = this.SH - 1;
+				}
 				this.applyNewPositions(drone, drone.acc, secs);
 				drone.pos.x %= this.SW;
 				drone.pos.y %= this.SH;
@@ -145,7 +152,17 @@ Drones.prototype.update = function(secs) {
 
 				drone.pos.x %= this.SW;
 				drone.pos.y %= this.SH;
+				if (drone.pos.x < 0) {
+					drone.pos.x = this.SW - 1;
+				}
+				if (drone.pos.y < 0) {
+					drone.pos.y = this.SH - 1;
+				}
+				try{
 				this.applyNewPositions(drone, drone.acc, secs);
+			}catch(e){
+				console.log(drone);
+			}
 				drone.pos.x %= this.SW;
 				drone.pos.y %= this.SH;
 			}

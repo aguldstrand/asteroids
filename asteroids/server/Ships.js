@@ -2,6 +2,7 @@ var Base = require('./Base');
 var Point = require('../Point');
 var Asteroid = require('../Asteroid');
 var Bullet = require('../Bullet');
+var Rocket = require('../Rocket');
 
 
 function Ships(options) {
@@ -16,6 +17,14 @@ function Ships(options) {
 }
 
 Ships.prototype = new Base();
+
+Ships.prototype.log = function(msg) {
+	var numShips = this.gameModel.ships.length;
+	for (var s = 0; s < numShips; s++) {
+		var ship = this.gameModel.ships[s];
+		console.log(msg, ship.pos.x, ship.acc.x, ship.vel.x);
+	}
+};
 
 Ships.prototype.update = function(secs) {
 
@@ -33,6 +42,12 @@ Ships.prototype.update = function(secs) {
 	// MOVE SHIPS (BASED ON USER INPUT)			
 	for (var s = 0; s < numShips; s++) {
 		var ship = this.gameModel.ships[s];
+
+		if(!ship.alive){
+			ship.reset();
+			continue;
+		}
+
 		var shipAcc = new Point(0, 0);
 		var userInput = this.gameModel.userInputs[ship.id];
 
@@ -88,6 +103,18 @@ Ships.prototype.update = function(secs) {
 			ship.bullets.push(newBullet);
 			ship.bulletTimer = 0;
 		}
+
+		//////////////
+		// Rocket //
+		//////////////
+		if (userInput.ctrl && ship.bulletTimer >= 1.0) {
+			var rocket = new Rocket(ship);
+
+			ship.rockets.push(rocket);
+			ship.bulletTimer = 0;
+		}
+
+
 		ship.bulletTimer += secs;
 
 		ship.pos.x %= this.SW;
@@ -167,7 +194,7 @@ Ships.prototype.update = function(secs) {
 		//ship.pos.y += ship.vel.y*secs + g.y;
 
 
-
+		/*
 		for (var mb = 0; mb < numBulletsInShip; mb++) {
 			var bullet = ship.bullets[mb];
 
@@ -211,7 +238,7 @@ Ships.prototype.update = function(secs) {
 				//bullet.pos.y -= Math.cos(bullet.direction * piOver180 ) * bulletSpeed * secs - gb.y;	
 			}
 			//
-		}
+		}*/
 
 
 
