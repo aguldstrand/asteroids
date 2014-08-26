@@ -64,35 +64,7 @@ define([
 			y: Math.sin(angle) * point.x + Math.cos(angle) * point.y
 		};
 	};
-	Asteroids.prototype.update = function(step, polys, asteroids) {
-		/*var numPolys = 0;
-		var pixel = this.pixel;
-		var len = asteroids.length;
-		for (var i = 0; i < len; i++) {
-			var asteroid = asteroids[i];
 
-			this.p.x = asteroid.diam;
-
-
-
-			for (var j = 0; j < 8; j++) {
-
-
-
-				var ap = this.rotate_point(this.p, (j * 45 - 45) + asteroid.rot);
-
-				var rp = this.rotate_point(this.p, (j * 45) + asteroid.rot);
-				//ap.x = ap.x + Math.random() * asteroid.diam;
-				//rp.x = rp.x + Math.random() * asteroid.diam;
-
-
-				// numPolys += Poly.addR(asteroid.pos.x, asteroid.pos.y, ap.x, ap.y, rp.x, rp.y, 0, 0, polys, 1);
-			}
-		}
-
-
-		return numPolys;*/
-	};
 
 	Asteroids.prototype.draw = function(program, asteroids) {
 		var polygon = this.polygon;
