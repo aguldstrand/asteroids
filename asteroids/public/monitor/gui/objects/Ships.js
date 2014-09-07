@@ -91,31 +91,32 @@ define([
 	}
 
 	Ships.prototype.load = function() {
-		var vertices = [];
-
-		var x = 0;
-		var y = 0;
-		var rotation = 0;
-
-		var Lwing = this.rotate_point(this.LwingP, rotation);
-		var Lwingi = this.rotate_point(this.LwingPi, rotation);
-		var Rwing = this.rotate_point(this.RwingP, rotation);
-		var Rwingi = this.rotate_point(this.RwingPi, rotation);
-		var Nose = this.rotate_point(this.noseP, rotation);
-		var Rear = this.rotate_point(this.rearP, rotation);
-		var RearIR = this.rotate_point(this.rearIR, rotation);
-		var RearIL = this.rotate_point(this.rearIL, rotation);
-
-		Poly.addR(x, y, Lwing.x, Lwing.y, Lwingi.x, Lwingi.y, Nose.x, Nose.y, vertices, 1);
-		Poly.addR(x, y, Rwing.x, Rwing.y, Rwingi.x, Rwingi.y, Nose.x, Nose.y, vertices, 1);
-		Poly.addR(x, y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, Rear.x, Rear.y, vertices, 1);
-		Poly.addR(x, y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, vertices, 1);
-		Poly.addR(x, y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, vertices, 1);
-
-		// Poly.addR(x, y, 0, 0, 2, 2, ship.vel.x, ship.vel.y, polys, 1);
-
-
+		var vertices = [
+			-20, -20,
+			-18, -18,
+			40, 0,
+			-20, 20,
+			-18, 18,
+			40, 0,
+			-20, 20,
+			-20, -20,
+			-28, 0,
+			-20, 20,
+			-20, -20,
+			0, 0,
+			-15, 1,
+			-15, -1,
+			40, 0
+		];
 		this.shipPolygon = WebGL.createPolygon(vertices);
+
+
+		var droneVertices = [
+			0.0, 0.0,
+			1.5, 0.5,
+			0.0, 1.0
+		];
+		this.dronePolygon = WebGL.createPolygon(droneVertices);
 
 
 		var bulletVertices = [
@@ -178,25 +179,6 @@ define([
 
 			window.tracker.outFixed('ship' + i, ship.pos.x + ':' + ship.pos.y);
 
-			//SHIP
-			var Lwing = this.rotate_point(this.LwingP, ship.rot);
-			var Lwingi = this.rotate_point(this.LwingPi, ship.rot);
-			var Rwing = this.rotate_point(this.RwingP, ship.rot);
-			var Rwingi = this.rotate_point(this.RwingPi, ship.rot);
-			var Nose = this.rotate_point(this.noseP, ship.rot);
-			var Rear = this.rotate_point(this.rearP, ship.rot);
-			var RearIR = this.rotate_point(this.rearIR, ship.rot);
-			var RearIL = this.rotate_point(this.rearIL, ship.rot);
-
-
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Lwing.x, Lwing.y, Lwingi.x, Lwingi.y, Nose.x, Nose.y, polys, 1);
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Rwingi.x, Rwingi.y, Nose.x, Nose.y, polys, 1);
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, Rear.x, Rear.y, polys, 1);
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, polys, 1);
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, polys, 1);
-
-			//numPolys += Poly.addR(ship.pos.x, ship.pos.y, 0, 0, 2, 2, ship.vel.x, ship.vel.y, polys, 1);
-
 			var j;
 
 			//SHIELD
@@ -216,32 +198,7 @@ define([
 				}
 			}
 
-			//DRONE
-			var drones = ship.drones;
-			var numDrones = drones.length;
-			for (j = 0; j < numDrones; j++) {
-				var drone = drones[j];
-
-				var droneP = this.rotate_point(this.droneP, this.dp_rotation);
-				var droneLW = this.rotate_point(this.droneLW, drone.rot);
-				var droneRW = this.rotate_point(this.droneRW, drone.rot);
-				var droneN = this.rotate_point(this.droneN, drone.rot);
-				numPolys += Poly.addR(drone.pos.x, drone.pos.y, droneLW.x, droneLW.y, droneRW.x, droneRW.y, droneN.x, droneN.y, polys, 1);
-
-				//numPolys += Poly.addR(drone.pos.x, drone.pos.y, 0, 0, 2, 2, drone.vel.x, drone.vel.y, polys, 1);
-			}
-
-
-			//BULLETS
-			var numBullets = ship.bullets.length;
-			for (var b = 0; b < numBullets; b++) {
-				var bullet = ship.bullets[b];
-				numPolys += Poly.addR(bullet.pos.x, bullet.pos.y, 0, 0, 2, 2, bullet.vel.x * 0.1, bullet.vel.y * 0.1, polys, 1);
-				//numPolys += Poly.add(bullet.pos.x, bullet.pos.y, 20, 20, polys);
-				//window.tracker.outFixed('bullet' + b, bullet.vel.x + ':' + bullet.vel.y);
-			}
-
-			//BULLETS
+			//ROCKETS
 			var numRockets = ship.rockets.length;
 			for (b = 0; b < numRockets; b++) {
 				var rocket = ship.rockets[b];
@@ -259,8 +216,6 @@ define([
 		var polygon = this.shipPolygon;
 		var uniforms = program.uniforms;
 
-		WebGL.bindAttribBuffer(polygon.vertexBuffer, program.attributes.a_position, polygon.itemSize);
-		// WebGL.bindUniform(uniforms.u_color, this.color);
 
 		var positionLocation = uniforms.u_position;
 		var rotationLocation = uniforms.u_rotation;
@@ -274,6 +229,7 @@ define([
 			var ship = ships[i];
 			var pos = ship.pos;
 
+			WebGL.bindAttribBuffer(polygon.vertexBuffer, program.attributes.a_position, polygon.itemSize);
 			WebGL.bindUniform(uniforms.u_color, ship.color);
 
 			gl.uniform2f(positionLocation, pos.x, pos.y);
@@ -282,22 +238,44 @@ define([
 
 			gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
 
+			// Drones
+			WebGL.bindAttribBuffer(this.dronePolygon.vertexBuffer, program.attributes.a_position, this.dronePolygon.itemSize);
+			for (var j = ship.drones.length; j--; ) {
+				var drone = ship.drones[j];
 
+				gl.uniform2f(positionLocation, drone.pos.x, drone.pos.y);
+				gl.uniform1f(rotationLocation, drone.rot * DEG_TO_RAD);
+				gl.uniform1f(scaleLocation, 10.0);
+
+				gl.drawArrays(gl.TRIANGLES, 0, this.dronePolygon.vertexCount);
+			}			
+
+
+			// Bullets
 			WebGL.bindAttribBuffer(this.bulletPolygon.vertexBuffer, program.attributes.a_position, this.bulletPolygon.itemSize);
-			for (var j = ship.bullets.length; j--; ) {
+			for (j = ship.bullets.length; j--; ) {
 				var bullet = ship.bullets[j];
 
 				gl.uniform2f(positionLocation, bullet.pos.x, bullet.pos.y);
-				gl.uniform1f(rotationLocation, bullet.rot * DEG_TO_RAD);
+				gl.uniform1f(rotationLocation, Math.tan(bullet.vel.x, bullet.vel.y));
 				gl.uniform1f(scaleLocation, 10.0);
 
 				gl.drawArrays(gl.TRIANGLES, 0, this.bulletPolygon.vertexCount);
+			}
 
+			// Rockets
+			WebGL.bindAttribBuffer(this.bulletPolygon.vertexBuffer, program.attributes.a_position, this.bulletPolygon.itemSize);
+			for (j = ship.rockets.length; j--; ) {
+				var rocket = ship.rockets[j];
+
+				gl.uniform2f(positionLocation, rocket.pos.x, rocket.pos.y);
+				gl.uniform1f(rotationLocation, rocket.rot * DEG_TO_RAD);
+				gl.uniform1f(scaleLocation, 10.0);
+
+				gl.drawArrays(gl.TRIANGLES, 0, this.bulletPolygon.vertexCount);
 			}
 		}
-
 	};
-
 
 
 	return Ships;
