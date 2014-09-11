@@ -21,7 +21,7 @@ function Ship(id, options) {
 
 	BasePhysics.apply(this);
 
-	this.maxVel = 500;
+	this.maxVel = 800;
 }
 
 Ship.prototype = new BasePhysics();
@@ -37,18 +37,17 @@ Ship.prototype.handleCollision = function(other) {
 			break;
 		}
 	}
-	
+
 	this.alive = hasShield;
-	
-	return !hasShield;	
+
+	return !hasShield;
 };
 
-Ship.prototype.reset = function (){
-		this.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
-		this.shieldStarter = 64;
-		this.alive = true;
+Ship.prototype.reset = function() {
+	this.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
+	this.shieldStarter = 64;
+	this.alive = true;
 };
-
 
 
 

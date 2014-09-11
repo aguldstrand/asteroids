@@ -27,7 +27,7 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	var g = this.getGravity(obj.pos);
 
-	
+
 
 	obj.acc.x = g.x + acc.x;
 	obj.acc.y = g.y + acc.y;
@@ -249,7 +249,7 @@ Base.prototype.getTargetsInRange = function(pos, radius, playerId, onlyShips) {
 Base.prototype.checkCollisions = function(sourceList, sourceIndex, targetList, excludeTargetIndex) {
 	var source = sourceList[sourceIndex];
 
-	for (var i = targetList.length; i--; ) {
+	for (var i = targetList.length; i--;) {
 		if (i === excludeTargetIndex) {
 			continue;
 		}
