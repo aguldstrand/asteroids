@@ -149,7 +149,7 @@ GameLoop.prototype.step = function() {
 			var len = JSON.stringify(this.gameModel).length;
 
 
-			process.stdout.write('FPS: ' + _step + "  |data size: " + len + ' bytes\033[0G');
+			process.stdout.write('FPS: ' + _step + "  |data size: " + len / 1000 + ' KB |  ships: ' + this.gameModel.ships.length + '  \033[0G');
 		}
 
 
@@ -172,9 +172,9 @@ GameLoop.prototype.addPlayer = function(id, options) {
 	ship.pos.y = this.SH * 0.5;
 	this.gameModel.ships.push(ship);
 	this.gameModel.userInputs[id] = {};
-	console.log('________________________');
+	/*console.log('________________________');
 	console.log('player added', ship);
-	console.log('________________________');
+	console.log('________________________');*/
 };
 
 GameLoop.prototype.removePlayer = function(id) {
