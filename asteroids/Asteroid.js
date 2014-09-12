@@ -18,4 +18,13 @@ Asteroid.prototype.handleCollision = function(other) {
 	this.alive = false;
 	return true;
 };
+
+
+Asteroid.prototype.toJSON = function() {
+	return {
+		pos: this.pos,
+		diam: this.diam,
+		rot: this.rot
+	};
+};
 module.exports = Asteroid;

@@ -10,4 +10,11 @@ function Drone() {
 
 Drone.prototype = new BasePhysics();
 
+Drone.prototype.toJSON = function() {
+	return {
+		rot: this.rot,
+		pos: this.pos
+	};
+};
+
 module.exports = Drone;

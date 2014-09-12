@@ -36,4 +36,14 @@ BasePhysics.prototype.rotate = function(p, origin, angle) {
 	);
 };
 
+
+BasePhysics.prototype.toJSON = function() {
+	return {
+		pos: this.pos,
+		vel: this.vel,
+		acc: this.acc
+	};
+};
+
+
 module.exports = BasePhysics;

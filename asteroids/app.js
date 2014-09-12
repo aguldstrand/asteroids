@@ -7,9 +7,12 @@ app.use(express.static('./public'));
 var GameLoop = require('./GameLoop2');
 var GameModel = require('./GameModel');
 
+
+
 var gameLoop = new GameLoop({
 	gameModel: new GameModel(),
 	sendGameState: function(state) {
+
 		app.io.broadcast('monitor:game-state', state);
 	}
 });

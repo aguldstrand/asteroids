@@ -27,6 +27,7 @@ function Ship(id, options) {
 Ship.prototype = new BasePhysics();
 
 
+
 Ship.prototype.handleCollision = function(other) {
 	var hasShield = false;
 	for (var x = 0; x < 8; x++) {
@@ -47,6 +48,19 @@ Ship.prototype.reset = function() {
 	this.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
 	this.shieldStarter = 64;
 	this.alive = true;
+};
+
+Ship.prototype.toJSON = function() {
+	return {
+		pos: this.pos,
+		acc: this.acc,
+		id: this.id,
+		rot: this.rot,
+		bullets: this.bullets,
+		rockets: this.rockets,
+		drones: this.drones,
+		shieldHealth: this.shieldHealth
+	};
 };
 
 

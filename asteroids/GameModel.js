@@ -9,4 +9,15 @@ function GameModel() {
 	this.SH = 3000;
 }
 
+
+GameModel.prototype.toJSON = function() {
+	return {
+		ships: this.ships,
+		asteroids: this.asteroids,
+		explosions: this.explosions,
+		SW: this.SW,
+		SH: this.SH
+	};
+};
+
 module.exports = GameModel;

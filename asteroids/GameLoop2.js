@@ -76,8 +76,8 @@ GameLoop.prototype.init = function() {
 	this.gravity = new Gravity(options);
 	//this.bullets = new Bullets(options);
 	this.drones = new Drones(options);
-	this.rockets = new Projectiles(options,'rockets');
-	this.bullets = new Projectiles(options,'bullets');
+	this.rockets = new Projectiles(options, 'rockets');
+	this.bullets = new Projectiles(options, 'bullets');
 };
 
 GameLoop.prototype.degreesToRadians = function(degrees) {
@@ -86,15 +86,7 @@ GameLoop.prototype.degreesToRadians = function(degrees) {
 
 GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
-	this.frameCounter++;
-	if (this.frameCounter % 100 === 0) {
 
-		var diff = process.hrtime(this.fpsLastTime);
-		this.fpsLastTime = process.hrtime();
-		var _step = (100 / ((diff[0] * 1e9 + diff[1]) / 1e9)) | 0;
-
-		console.log('fps: ' + _step);
-	}
 
 	var numExplosions = this.gameModel.explosions.length;
 	var numShips = this.gameModel.ships.length;
@@ -145,6 +137,22 @@ GameLoop.prototype.step = function() {
 
 		var step = (diff[0] * 1e9 + diff[1]) / 1000000;
 		this.update(step);
+
+
+		this.frameCounter++;
+		if (this.frameCounter % 100 === 0) {
+
+			var diff = process.hrtime(this.fpsLastTime);
+			this.fpsLastTime = process.hrtime();
+			var _step = (100 / ((diff[0] * 1e9 + diff[1]) / 1e9)) | 0;
+
+			var len = JSON.stringify(this.gameModel).length;
+
+
+			process.stdout.write('FPS: ' + _step + "  |data size: " + len + ' bytes\033[0G');
+		}
+
+
 
 		// var a = process.hrtime();
 		this.sendGameState(this.gameModel);
