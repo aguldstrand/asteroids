@@ -88,7 +88,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		};
 	};
 
-	Ships.prototype.update = function(step, polys, ships) {
+	Ships.prototype.update = function(step, polys, ships, playerShip, isPlayer) {
 
 		var numPolys = 0;
 
@@ -126,6 +126,14 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		var len = ships.length;
 		for (var i = 0; i < len; i++) {
 			var ship = ships[i];
+
+			if (ship && ship.id === playerShip.id && !isPlayer) {
+				continue;
+			}
+
+			if (ship && ship.id !== playerShip.id && isPlayer) {
+				continue;
+			}
 
 			window.tracker.outFixed('ship' + i, ship.pos.x + ':' + ship.pos.y);
 

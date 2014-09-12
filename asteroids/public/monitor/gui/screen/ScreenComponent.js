@@ -97,9 +97,10 @@ define([
 			x: 0,
 			y: 0
 		};
+		var activeShip = null;
 		if (gameState.ships && gameState.ships.length > 0) {
 			var len = gameState.ships.length;
-			var activeShip = null;
+
 			for (var i = 0; i < len; i++) {
 				var ship = gameState.ships[i];
 				if (ship.id === window.io.socket.sessionid) {
@@ -147,10 +148,16 @@ define([
 		numPolys = this.explosions.update(step, polys, gameState.explosions);
 		this.draw(polys, numPolys, 1, 1, 0, 1);
 
-		//SHIPS
+		//SHIPS (other)
 		polys = [];
-		numPolys = this.ships.update(step, polys, gameState.ships);
+		numPolys = this.ships.update(step, polys, gameState.ships, activeShip, false);
+		this.draw(polys, numPolys, 1, 0, 0, 1);
+
+		//SHIPS (yours)
+		polys = [];
+		numPolys = this.ships.update(step, polys, gameState.ships, activeShip, true);
 		this.draw(polys, numPolys, 0, 1, 0, 1);
+
 
 		//Asteroids
 		polys = [];

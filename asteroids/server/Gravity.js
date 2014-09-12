@@ -6,6 +6,8 @@ function Gravity(options) {
 
 
 	Base.call(this, options);
+
+
 }
 
 Gravity.prototype = new Base();
@@ -33,7 +35,7 @@ Gravity.prototype.update = function(secs) {
 				normalizedRelativepos.normalize(1);
 
 				// multiply gravity force size
-				var gravForceSize = Math.pow(1 / relativePos.length(), 1.5) * +explosion.size * 5000;
+				var gravForceSize = Math.pow(1 / relativePos.length(), 1.25) * +explosion.size * 9000;
 
 				var _____x = normalizedRelativepos.x * gravForceSize;
 				var _____y = normalizedRelativepos.y * gravForceSize;

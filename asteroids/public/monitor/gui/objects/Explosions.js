@@ -5,7 +5,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		this.SH = SH;
 		this.SW = SW;
 
-
+		this.expHash = {};
 	}
 
 	Explosions.prototype.update = function(step, polys, explosions) {
@@ -17,18 +17,41 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			p: {}
 		};
 
-
+		var explosion = null;
+		var explosionSize = null;
 		var ppCnt = 0;
 		for (var i = 0; i < explosions.length; i++) {
-			var explosion = explosions[i];
-			var explosionSize = explosion.size;
+			explosion = explosions[i];
+			explosionSize = explosion.size;
 
+			if (!this.expHash[explosion.pos.x + '_' + explosion.pos.y]) {
+				this.expHash[explosion.pos.x + '_' + explosion.pos.y] = [explosion.size + 120, explosion.pos.x, explosion.pos.y];
+			}
 			//audioManager.addSound(AudioManager.TYPE_EXPLOSION, explosion.pos, explosion.size);
+
+
+		}
+
+
+
+		for (var key in this.expHash) {
+
+			explosion = {
+				pos: {
+					x: this.expHash[key][1],
+					y: this.expHash[key][2]
+				}
+			};
+			explosionSize = this.expHash[key][0];
 
 			for (var e = 0; e < explosionSize; e++) {
 
+
+
 				var radi = Math.random() * explosionSize;
 				var radius = Math.random() * 360;
+
+
 
 				for (var r = 0; r < radi; r += 6) {
 
@@ -36,18 +59,20 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 					var posX = (Math.sin(radius * piOver180) * randSize) + explosion.pos.x;
 					var posY = (Math.cos(radius * piOver180) * randSize) + explosion.pos.y;
 
+
+
 					numPolys += Poly.add(posX, posY, pixel, pixel, polys, false, Poly.TL);
 					ppCnt++;
 
 					if (explosionSize > 150) {
-						numPolys += Poly.add(posX + 1, posY, pixel, pixel, polys, false, Poly.TL);
-						numPolys += Poly.add(posX, posY + 1, pixel, pixel, polys, false, Poly.TL);
-						numPolys += Poly.add(posX + 1, posY + 1, pixel, pixel, polys, false, Poly.TL);
+						numPolys += Poly.add(posX + 2, posY, pixel, pixel, polys, false, Poly.TL);
+						numPolys += Poly.add(posX, posY + 2, pixel, pixel, polys, false, Poly.TL);
+						numPolys += Poly.add(posX + 2, posY + 2, pixel, pixel, polys, false, Poly.TL);
 
 
 						if (ppCnt > 1) {
 							ppCnt = 0;
-							if (this.pixelPoints.length < 4000) {
+							if (this.pixelPoints.length < 6000) {
 								pp = {
 									p: {}
 								};
@@ -64,7 +89,14 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				}
 
 			}
+
+			this.expHash[key][0] -= 10;
+
+			if (this.expHash[key][0] < 1) {
+				delete this.expHash[key];
+			}
 		}
+
 
 
 		/*if (numExplosions > 0) {

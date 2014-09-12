@@ -35,7 +35,7 @@ function GameLoop(options) {
 
 	this.gravityRes = null; //: int;
 
-
+	this.odd = true;
 
 	this.init();
 }
@@ -155,7 +155,11 @@ GameLoop.prototype.step = function() {
 
 
 		// var a = process.hrtime();
-		this.sendGameState(this.gameModel);
+		if (this.odd) {
+			this.sendGameState(this.gameModel);
+
+		}
+		this.odd = !this.odd;
 		// var b = process.hrtime(a);
 		// console.log((diff[0] * 1e9 + diff[1]) / 1e9);
 
