@@ -40,6 +40,9 @@ Ship.prototype.handleCollision = function(other) {
 	}
 
 	this.alive = hasShield;
+	if (!this.alive) {
+		this.spawnTimer = 3;
+	}
 
 	return !hasShield;
 };
@@ -52,6 +55,7 @@ Ship.prototype.reset = function() {
 
 Ship.prototype.toJSON = function() {
 	return {
+		alive: this.alive,
 		pos: this.pos,
 		acc: this.acc,
 		id: this.id,

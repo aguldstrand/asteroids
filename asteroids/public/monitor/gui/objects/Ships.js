@@ -78,6 +78,24 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		this.d_rotation = 0;
 
 
+		this.epp = [{
+			x: 0,
+			y: 0
+		}, {
+			x: 0,
+			y: 0
+		}, {
+			x: 0,
+			y: 0
+		}, {
+			x: 0,
+			y: 0
+		}, {
+			x: 0,
+			y: 0
+		}];
+
+		this.localHash = {};
 	}
 
 	Ships.prototype.rotate_point = function(point, angle) {
@@ -86,6 +104,81 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			x: Math.cos(angle) * point.x - Math.sin(angle) * point.y,
 			y: Math.sin(angle) * point.x + Math.cos(angle) * point.y
 		};
+	};
+
+	Ships.prototype.___eppAnimation = function(epp) {
+		var len = epp.length;
+		for (var e = 0; e < len; e++) {
+			epp[e].x += epp[e].vx;
+			epp[e].y += epp[e].vy;
+
+			epp[e].r += epp[e].rv;
+
+			epp[e].vx *= 0.97;
+			epp[e].vy *= 0.97;
+			epp[e].rv *= 0.995;
+		}
+	};
+	Ships.prototype.___eppStart = function(epp) {
+		var evel = 19;
+		var len = epp.length;
+		for (var e = 0; e < len; e++) {
+			epp[e] = {
+				x: 0,
+				y: 0,
+				vx: (Math.random() - 0.5) * evel * (Math.random() - 0.5) * 2,
+				vy: (Math.random() - 0.5) * evel * (Math.random() - 0.5) * 2,
+				r: parseInt(Math.random() * 360, 10),
+				rv: parseInt((Math.random() - 0.5) * 5, 10)
+			};
+		}
+	};
+
+	Ships.prototype.___eppResetAnimation = function(epp) {
+		var evel = 19;
+		var len = epp.length;
+
+		var fullReset = false;
+		for (var e = 0; e < len; e++) {
+			fullReset = false;
+
+			epp[e].x *= 0.95;
+			epp[e].y *= 0.95;
+			epp[e].r *= 0.95;
+
+			if (Math.abs(epp[e].x) < 2) {
+				epp[e].x = 0;
+				if (Math.abs(epp[e].y) < 2) {
+					epp[e].y = 0;
+					if (Math.abs(epp[e].r) < 2) {
+						epp[e].r = 0;
+						fullReset = true;
+					}
+
+				}
+			}
+
+
+		}
+		return fullReset;
+	};
+
+	Ships.prototype.___eppReset = function(epp) {
+		var evel = 19;
+		var len = 5;
+
+
+		for (var e = 0; e < len; e++) {
+			epp[e] = {
+				x: 0,
+				y: 0,
+				vx: 0,
+				vy: 0,
+				r: 0,
+				rv: 0
+			}
+		};
+		return epp;
 	};
 
 	Ships.prototype.update = function(step, polys, ships, playerShip, isPlayer) {
@@ -97,6 +190,34 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		this.ds_rotation -= 1.5;
 		this.dp_rotation -= 0.5;
 
+
+		/*
+		var epp = this.epp;
+		var e = 0;
+		var evel = 19;
+		if (epp.length === 0) {
+			for (e = 0; e < 5; e++) {
+				epp.push({
+					x: 0,
+					y: 0,
+					vx: (Math.random() - .5) * evel * (Math.random() - .5) * 2,
+					vy: (Math.random() - .5) * evel * (Math.random() - .5) * 2,
+					r: parseInt(Math.random() * 360, 10),
+					rv: parseInt((Math.random() - .5) * 5, 10)
+				});
+			}
+		} else {
+			for (e = 0; e < 5; e++) {
+				epp[e].x += epp[e].vx;
+				epp[e].y += epp[e].vy;
+
+				epp[e].r += epp[e].rv;
+
+				epp[e].vx *= 0.97;
+				epp[e].vy *= 0.97;
+				epp[e].rv *= 0.995;
+			}
+		}*/
 
 		/*
 		{
@@ -127,6 +248,8 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		for (var i = 0; i < len; i++) {
 			var ship = ships[i];
 
+
+
 			if (ship && ship.id === playerShip.id && !isPlayer) {
 				continue;
 			}
@@ -135,24 +258,53 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				continue;
 			}
 
-			window.tracker.outFixed('ship' + i, ship.pos.x + ':' + ship.pos.y);
+
+
+			if (!this.localHash[ship.id]) {
+				this.localHash[ship.id] = {
+					epp: this.___eppReset([]),
+					eppStarted: false
+				};
+			}
+
+			var localHash = this.localHash[ship.id];
+			var epp = localHash.epp;
+
+			if (!ship.alive) {
+				if (!localHash.eppStarted) {
+					this.___eppStart(epp);
+					localHash.eppStarted = true;
+				}
+				this.___eppAnimation(epp);
+			} else {
+				if (localHash.eppStarted) {
+					if (this.___eppResetAnimation(epp)) {
+						localHash.eppStarted = false;
+						this.___eppReset(epp);
+					}
+				}
+			}
+
+
+
+			//window.tracker.outFixed('ship' + i, ship.pos.x + ':' + ship.pos.y);
 
 			//SHIP
-			var Lwing = this.rotate_point(this.LwingP, ship.rot);
-			var Lwingi = this.rotate_point(this.LwingPi, ship.rot);
-			var Rwing = this.rotate_point(this.RwingP, ship.rot);
-			var Rwingi = this.rotate_point(this.RwingPi, ship.rot);
-			var Nose = this.rotate_point(this.noseP, ship.rot);
-			var Rear = this.rotate_point(this.rearP, ship.rot);
-			var RearIR = this.rotate_point(this.rearIR, ship.rot);
-			var RearIL = this.rotate_point(this.rearIL, ship.rot);
+			var Lwing = this.rotate_point(this.LwingP, ship.rot + epp[0].r);
+			var Lwingi = this.rotate_point(this.LwingPi, ship.rot + epp[0].r);
+			var Rwing = this.rotate_point(this.RwingP, ship.rot + epp[1].r);
+			var Rwingi = this.rotate_point(this.RwingPi, ship.rot + epp[1].r);
+			var Nose = this.rotate_point(this.noseP, ship.rot + epp[2].r);
+			var Rear = this.rotate_point(this.rearP, ship.rot + epp[3].r);
+			var RearIR = this.rotate_point(this.rearIR, ship.rot + epp[3].r);
+			var RearIL = this.rotate_point(this.rearIL, ship.rot + epp[3].r);
 
 
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Lwing.x, Lwing.y, Lwingi.x, Lwingi.y, Nose.x, Nose.y, polys, 1);
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Rwingi.x, Rwingi.y, Nose.x, Nose.y, polys, 1);
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, Rear.x, Rear.y, polys, 1);
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, polys, 1);
-			numPolys += Poly.addR(ship.pos.x, ship.pos.y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, polys, 1);
+			numPolys += Poly.addR(ship.pos.x + epp[0].x, ship.pos.y + epp[0].y, Lwing.x, Lwing.y, Lwingi.x, Lwingi.y, Nose.x, Nose.y, polys, 1);
+			numPolys += Poly.addR(ship.pos.x + epp[1].x, ship.pos.y + epp[1].y, Rwing.x, Rwing.y, Rwingi.x, Rwingi.y, Nose.x, Nose.y, polys, 1);
+			numPolys += Poly.addR(ship.pos.x + epp[2].x, ship.pos.y + epp[2].y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, Rear.x, Rear.y, polys, 1);
+			numPolys += Poly.addR(ship.pos.x + epp[3].x, ship.pos.y + epp[3].y, Rwing.x, Rwing.y, Lwing.x, Lwing.y, 0, 0, polys, 1);
+			numPolys += Poly.addR(ship.pos.x + epp[4].x, ship.pos.y + epp[4].y, RearIR.x, RearIR.y, RearIL.x, RearIL.y, Nose.x, Nose.y, polys, 1);
 
 			//numPolys += Poly.addR(ship.pos.x, ship.pos.y, 0, 0, 2, 2, ship.vel.x, ship.vel.y, polys, 1);
 

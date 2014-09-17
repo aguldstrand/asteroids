@@ -43,7 +43,14 @@ Ships.prototype.update = function(secs) {
 	for (var s = 0; s < numShips; s++) {
 		var ship = this.gameModel.ships[s];
 
-		if(!ship.alive){
+		if (ship.spawnTimer > 0) {
+			ship.spawnTimer -= secs;
+
+			continue;
+		}
+
+
+		if (!ship.alive && ship.spawnTimer < 0) {
 			ship.reset();
 			continue;
 		}
@@ -152,16 +159,21 @@ Ships.prototype.update = function(secs) {
 			if (dist < -5) {
 
 
-				var hasShield = this.shieldCollision(ship);
+				//var hasShield = this.shieldCollision(ship);
+				ship.handleCollision( /*other*/ );
 
-				if (!hasShield) {
+				if (!ship.alive) {
 
 
 					this.gameModel.asteroids.splice(j, 1);
 					j--;
 					len--;
 
-					this.resetShip(ship, collidable);
+					//this.resetShip(ship, collidable);
+					var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
+					this.createExplosion((collidable.diam || 200) * 5, explosionOrigin);
+
+
 					/*
 					var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
 					this.createExplosion(collidable.diam * 5, explosionOrigin);					
