@@ -167,8 +167,8 @@ define([
 
 		//gravity - debug
 		polys = [];
-		//numPolys = this.debug.update(step, polys, gameState.gravity);
-		//this.draw(polys, numPolys, 1, 0, 0, 1);
+		numPolys = this.debug.update(step, polys, gameState.gravity, focusPoint);
+		this.draw(polys, numPolys, 1, 0, 0, 1);
 
 
 		//minimap BG

@@ -63,6 +63,12 @@ GameLoop.prototype.init = function() {
 	}
 	this.gameModel.gravity = gravity;
 
+	var staticGravity = this.staticGravity = [];
+	for (var j = 0; j < gLen; j++) {
+		staticGravity[j] = new Point();
+	}
+	this.gameModel.staticGravity = staticGravity;
+
 	var options = {
 		gm: this.gameModel,
 		gravity: this.gravity,
@@ -149,7 +155,7 @@ GameLoop.prototype.step = function() {
 			var len = JSON.stringify(this.gameModel).length;
 
 
-			process.stdout.write('FPS: ' + _step + "  |data size: " + len / 1000 + ' KB |  ships: ' + this.gameModel.ships.length + '  \033[0G');
+			process.stdout.write('FPS: ' + _step + "  |data size: " + len / 1000 + ' KB |  ships: ' + this.gameModel.ships.length + '  |  asteroids : ' + this.gameModel.asteroids.length + '  \033[0G');
 		}
 
 

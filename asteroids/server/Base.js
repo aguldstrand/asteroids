@@ -27,6 +27,27 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	var g = this.getGravity(obj.pos);
 
+	if (!g) {
+
+		if (Math.random() > 0.5) {
+			obj.pos.x = 250 + Math.random() * 200;
+			obj.pos.y = 400 + Math.random() * 100;
+		} else {
+			obj.pos.y = 250 + Math.random() * 200;
+			obj.pos.x = 400 + Math.random() * 100;;
+		}
+
+
+
+		obj.vel.x = 0;
+		obj.vel.y = 0;
+		obj.acc.x = 0;
+		obj.acc.y = 0;
+		return;
+
+
+	}
+
 
 
 	obj.acc.x = g.x + acc.x;

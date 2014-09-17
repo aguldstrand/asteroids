@@ -18,14 +18,16 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			y: Math.sin(angle) * point.x + Math.cos(angle) * point.y
 		};
 	};
-	Debug.prototype.update = function(step, polys, gravity) {
+	Debug.prototype.update = function(step, polys, gravity, focusPoint) {
 		var numPolys = 0;
 		//var pixel = this.pixel;
 
 		var gravityRes = 50;
 
-		var yMax = parseInt(1000 / gravityRes, 10);
-		var xMax = parseInt(1000 / gravityRes, 10);
+
+
+		var yMax = parseInt(3000 / gravityRes, 10);
+		var xMax = parseInt(3000 / gravityRes, 10);
 		var offset = 10;
 		for (var y = 0; y < yMax; y++) {
 			for (var x = 0; x < xMax; x++) {

@@ -8,6 +8,7 @@ function GameModel() {
 	this.SW = 3000;
 	this.SH = 3000;
 	this.gravity = [];
+	this.staticGravity = [];
 
 
 	/*for (var i = 0; i < 200000; i++) {
@@ -24,7 +25,8 @@ GameModel.prototype.toJSON = function() {
 		asteroids: this.asteroids,
 		explosions: this.explosions,
 		SW: this.SW,
-		SH: this.SH
+		SH: this.SH,
+		gravity: this.gravity
 
 	};
 };
