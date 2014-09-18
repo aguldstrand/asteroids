@@ -8,6 +8,10 @@ function BasePhysics() {
 	this.acc = new Point();
 
 	this.alive = true;
+
+	this.d_pos = [];
+	this.d_vel = [];
+	this.d_acc = [];
 }
 
 

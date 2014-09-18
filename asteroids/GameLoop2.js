@@ -57,21 +57,22 @@ GameLoop.prototype.init = function() {
 	this.gravityDebug = [];
 	this.gravityRes = 50;
 	var gLen = parseInt(this.SW / this.gravityRes, 10) * parseInt(this.SH / this.gravityRes, 10);
+
 	var gravity = this.gravity = [];
+	var staticGravity = this.staticGravity = [];
 	for (var i = 0; i < gLen; i++) {
 		gravity[i] = new Point();
+		staticGravity[i] = new Point();
 	}
 	this.gameModel.gravity = gravity;
-
-	var staticGravity = this.staticGravity = [];
-	for (var j = 0; j < gLen; j++) {
-		staticGravity[j] = new Point();
-	}
 	this.gameModel.staticGravity = staticGravity;
+
+
 
 	var options = {
 		gm: this.gameModel,
 		gravity: this.gravity,
+		staticGravity: this.staticGravity,
 		gravityRes: this.gravityRes,
 		SW: this.SW,
 		SH: this.SH

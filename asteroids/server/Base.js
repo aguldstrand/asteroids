@@ -27,24 +27,10 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	var g = this.getGravity(obj.pos);
 
-	if (!g) {
-
-		if (Math.random() > 0.5) {
-			obj.pos.x = 250 + Math.random() * 200;
-			obj.pos.y = 400 + Math.random() * 100;
-		} else {
-			obj.pos.y = 250 + Math.random() * 200;
-			obj.pos.x = 400 + Math.random() * 100;;
-		}
-
-
-
-		obj.vel.x = 0;
-		obj.vel.y = 0;
-		obj.acc.x = 0;
-		obj.acc.y = 0;
-		return;
-
+	if (g.warp) {
+		obj.pos.x = g.warp.x + (Math.random() - 0.5) * 50;
+		obj.pos.y = g.warp.y + (Math.random() - 0.5) * 50;
+		g = this.getGravity(obj.pos);
 
 	}
 
@@ -54,24 +40,38 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 	obj.acc.y = g.y + acc.y;
 
 
+
 	if (obj.vel.length() > 0.1) {
 		var frictionP = new Point(-obj.vel.x, -obj.vel.y);
 		frictionP.normalize(obj.friction);
 		obj.acc.x += frictionP.x;
 		obj.acc.y += frictionP.y;
+
 	}
 
 	obj.vel.x += obj.acc.x * secs;
 	obj.vel.y += obj.acc.y * secs;
 
+
+
 	if (obj.vel.length() > obj.maxVel) {
 		//this fucks up something with ship velocity...
 		// obj.vel.normalize(obj.maxVel * secs); // Velocity should not be scaled to frame time
 		obj.vel.normalize(obj.maxVel);
+
+
 	}
 
 	obj.pos.x += obj.vel.x * secs;
 	obj.pos.y += obj.vel.y * secs;
+
+
+};
+
+Base.prototype.___log = function(log, name, obj) {
+	if (log) {
+		console.log(name, obj.pos.x, obj.pos.y, obj.vel.x, obj.vel.y, obj.acc.x, obj.acc.y);
+	}
 };
 
 
@@ -111,7 +111,7 @@ Base.prototype.resolveCollision = function(ballA, ballB) {
 	ballB.vel = ballB.vel.subtract(impulse.multiply(im2));
 };
 
-Base.prototype.getGravity = function(pos /*Point*/ ) {
+Base.prototype.getGravity = function(pos /*Point*/ , log) {
 	var _x = parseInt(parseInt(pos.x, 10) / this.gravityRes, 10);
 	var _y = parseInt(parseInt(pos.y, 10) / this.gravityRes, 10);
 
@@ -127,7 +127,34 @@ Base.prototype.getGravity = function(pos /*Point*/ ) {
 	//trace("index: " + index);
 
 
+	if (index < 0) {
+
+		console.log('=====================================');
+		console.log('g index out of bounds', index);
+		index = 0;
+	} else if (index >= this.gravity.length) {
+
+		console.log('=====================================');
+		console.log('g index out of bounds', index);
+		index = this.gravity.length - 1;
+	}
+
 	var gravity = this.gravity[index];
+
+
+	if (!gravity || log) {
+		console.log('================================================');
+		console.log(pos.x, pos.y);
+		console.log(_x, _y);
+		console.log(gravW);
+		console.log(index, this.gravity.length);
+		console.log(gravity);
+
+		console.log('================================================');
+
+
+
+	}
 
 	return gravity;
 };

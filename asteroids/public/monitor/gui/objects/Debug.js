@@ -35,7 +35,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				var g = gravity[x + y * xMax];
 
 
-				if (Math.abs(g.x) + Math.abs(g.y) > 30) {
+				if (Math.abs(g.x) > 15 || Math.abs(g.y) > 15) {
 
 					numPolys += Poly.addR(x * gravityRes, y * gravityRes, 0, 0, 2, 2, g.x * 0.1, g.y * 0.1 + 4, polys, 1);
 				}
