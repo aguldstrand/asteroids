@@ -96,7 +96,7 @@ Gravity.prototype.createStatic = function(explosion, negative, warp) {
 	var yMax = parseInt(this.SH / this.gravityRes, 10);
 	var xMax = parseInt(this.SW / this.gravityRes, 10);
 
-	var closest = 10000;
+	var closest = 0;
 	var closestGravPoint = null;
 	var closestX = 0;
 	var closestY = 0;
@@ -135,10 +135,11 @@ Gravity.prototype.createStatic = function(explosion, negative, warp) {
 			localGravity.x += xgra * negative;
 			localGravity.y += ygra * negative;
 
+			//console.log(Math.abs(__dx) * Math.abs(__dy));
+			if (gravForceSize > closest) {
+				closest = gravForceSize;
+				//closestGravPoint = localGravity;
 
-			if (Math.abs(__dx) * Math.abs(__dy) < closest) {
-				closest = Math.abs(__dx) * Math.abs(__dy);
-				closestGravPoint = localGravity;
 				closestX = x;
 				closestY = y;
 			}
@@ -150,12 +151,23 @@ Gravity.prototype.createStatic = function(explosion, negative, warp) {
 	if (warp) {
 		//closestGravPoint.warp = warp;
 
-		var range = 12;
-		var start = ((closestX + closestY) * xMax) - range * 0.5;
+		var range = 1;
+		//var start = (closestX + closestY * xMax) - range * 0.5;
+
+		for (var _x = closestX - range; _x < closestX + range; _x++) {
+			for (var _y = closestY - range; _y < closestY + range; _y++) {
+
+				var index = _x + _y * xMax;
+				closestGravPoint = gravity[index];
+				console.log(closestX, closestY, index);
+				closestGravPoint.warp = warp;
+			}
+		}
+		/*
 		for (var i = start; i < start + range; i++) {
 			closestGravPoint = gravity[i];
 			closestGravPoint.warp = warp;
-		}
+		}*/
 		/*
 		closestGravPoint = gravity[(closestX - 1 + closestY) * xMax];
 		closestGravPoint.warp = warp;
