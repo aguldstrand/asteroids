@@ -150,7 +150,7 @@ Gravity.prototype.createStatic = function(explosion, negative, warp) {
 	if (warp) {
 		//closestGravPoint.warp = warp;
 
-		var range = 30;
+		var range = 12;
 		var start = ((closestX + closestY) * xMax) - range * 0.5;
 		for (var i = start; i < start + range; i++) {
 			closestGravPoint = gravity[i];

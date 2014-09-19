@@ -95,6 +95,8 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			y: 0
 		}];
 
+		this.pixelPoints = [];
+
 		this.localHash = {};
 	}
 
@@ -176,8 +178,8 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				vy: 0,
 				r: 0,
 				rv: 0
-			}
-		};
+			};
+		}
 		return epp;
 	};
 
@@ -186,6 +188,8 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		var numPolys = 0;
 
 		this.d_rotation += 1;
+
+		var pixel = this.pixel;
 
 		this.ds_rotation -= 1.5;
 		this.dp_rotation -= 0.5;
@@ -244,18 +248,42 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
       }
     }*/
 
+		var pp;
+		var p;
+
 		var len = ships.length;
 		for (var i = 0; i < len; i++) {
 			var ship = ships[i];
 
 
 
-			if (ship && ship.id === playerShip.id && !isPlayer) {
+			if (playerShip && ship && ship.id === playerShip.id && !isPlayer) {
 				continue;
 			}
 
-			if (ship && ship.id !== playerShip.id && isPlayer) {
+			if (playerShip && ship && ship.id !== playerShip.id && isPlayer) {
 				continue;
+			}
+
+
+			if (ship.collidePos) {
+				if (this.pixelPoints.length < 500) {
+
+
+
+					for (p = 0; p < 10; p++) {
+						pp = {
+							p: {}
+						};
+						//pp.color = 0xFFFFFF;
+						pp.p.x = ship.collidePos.x;
+						pp.p.y = ship.collidePos.y;
+						pp.life = Math.random() * 50 + 10;
+						pp.drift = Math.random() * 4 - 2;
+						pp.fall = Math.random() * 4 - 2;
+						this.pixelPoints.push(pp);
+					}
+				}
 			}
 
 
@@ -360,6 +388,25 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			}
 		}
 
+
+		var ppLen = this.pixelPoints.length;
+		for (p = 0; p < ppLen; p++) {
+
+			pp = this.pixelPoints[p];
+			pp.p.y += pp.fall;
+			pp.p.x += pp.drift;
+
+			pp.life--;
+
+			//pp.color -= .00001;
+			numPolys += Poly.add(pp.p.x, pp.p.y, pixel * 2, pixel * 2, polys, false, Poly.TL);
+
+
+			if (pp.life < 0) {
+				ppLen--;
+				this.pixelPoints.splice(p, 1);
+			}
+		}
 
 
 		return numPolys;

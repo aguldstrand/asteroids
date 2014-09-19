@@ -26,7 +26,7 @@ GameModel.prototype.toJSON = function() {
 		explosions: this.explosions,
 		SW: this.SW,
 		SH: this.SH,
-		gravity: this.gravity
+		gravity: this.staticGravity
 
 	};
 };

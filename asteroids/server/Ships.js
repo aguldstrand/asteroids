@@ -43,6 +43,8 @@ Ships.prototype.update = function(secs) {
 	for (var s = 0; s < numShips; s++) {
 		var ship = this.gameModel.ships[s];
 
+		ship.resetStuf();
+
 		if (ship.spawnTimer > 0) {
 			ship.spawnTimer -= secs;
 

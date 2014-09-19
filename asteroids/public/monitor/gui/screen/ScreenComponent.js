@@ -127,6 +127,13 @@ define([
 		}
 
 
+		var numExplosions = gameState.explosions.length;
+		if (numExplosions > 0) {
+			focusPoint.y += (Math.random() - 0.5) * numExplosions * 30;
+			focusPoint.x += (Math.random() - 0.5) * numExplosions * 30;
+		}
+
+
 		Poly.setFocusPoint(focusPoint);
 
 		//CLEAR

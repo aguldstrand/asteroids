@@ -22,6 +22,8 @@ function Ship(id, options) {
 	BasePhysics.apply(this);
 
 	this.maxVel = 800;
+
+	this.collidePos = null;
 }
 
 Ship.prototype = new BasePhysics();
@@ -29,6 +31,11 @@ Ship.prototype = new BasePhysics();
 
 
 Ship.prototype.handleCollision = function(other) {
+
+	if (other && other.pos) {
+		this.collidePos = other.pos;
+	}
+
 	var hasShield = false;
 	for (var x = 0; x < 8; x++) {
 		var shieldFragment = this.shieldHealth[x];
@@ -47,6 +54,12 @@ Ship.prototype.handleCollision = function(other) {
 	return !hasShield;
 };
 
+
+Ship.prototype.resetStuf = function() {
+	this.collidePos = null;
+};
+
+
 Ship.prototype.reset = function() {
 	this.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
 	this.shieldStarter = 64;
@@ -63,7 +76,8 @@ Ship.prototype.toJSON = function() {
 		bullets: this.bullets,
 		rockets: this.rockets,
 		drones: this.drones,
-		shieldHealth: this.shieldHealth
+		shieldHealth: this.shieldHealth,
+		collidePos: this.collidePos
 	};
 };
 
