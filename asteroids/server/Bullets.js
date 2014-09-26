@@ -3,12 +3,18 @@ var Base = require('./Base');
 function Bullets(options) {
 
 
+
+
+	/*** DEPRECATED ***/
+
+
+
 	Base.call(this, options);
 }
 
 Bullets.prototype = new Base();
 
-Bullets.prototype.update = function(secs) {
+Bullets.prototype.move = function(secs) {
 	var numShips = this.gameModel.ships.length;
 	var numAsteroids = this.gameModel.asteroids.length;
 

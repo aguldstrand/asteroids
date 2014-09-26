@@ -10,7 +10,7 @@ function Asteroids(options) {
 
 Asteroids.prototype = new Base();
 
-Asteroids.prototype.update = function(secs) {
+Asteroids.prototype.move = function(secs) {
 	var len = this.gameModel.asteroids.length;
 	for (var a = 0; a < len; a++) {
 		var asteroid = this.gameModel.asteroids[a];
@@ -38,21 +38,24 @@ Asteroids.prototype.update = function(secs) {
 			asteroid.rot = 360;
 		}
 
-		//var ag:Point = getGravity(asteroid.pos);
-		//asteroid.vel.x += ag.x;
-		//asteroid.vel.y += ag.y;
-		//asteroid.vel.x = 10;
-		this.applyNewPositions(asteroid, new Point(0, 0), secs);
 
+		this.applyNewPositions(asteroid, new Point(0, 0), secs);
+	}
+};
+
+Asteroids.prototype.collide = function() {
+	/*var len = this.gameModel.asteroids.length;
+	for (var a = 0; a < len; a++) {
+		var asteroid = this.gameModel.asteroids[a];
 		for (var j = 0; j < len; j++) {
 			var collidable = this.gameModel.asteroids[j];
-			if (j != a) {
+			if (j !== a) {
 
 				var dx = collidable.pos.x - asteroid.pos.x;
 				var dy = collidable.pos.y - asteroid.pos.y;
 				var radi = collidable.diam + asteroid.diam;
 
-				// var dist = ((dx * dx) + (dy * dy)) - (radi * radi);
+
 
 				var dist = Math.sqrt(dx * dx + dy * dy) - radi;
 
@@ -61,16 +64,30 @@ Asteroids.prototype.update = function(secs) {
 					this.resolveCollision(collidable, asteroid);
 
 				}
-				// logger.log(dist2);
+
 			}
 
 		}
+	}*/
 
-		//asteroid.pos.x += asteroid.vel.x * secs + ag.x;
-		//asteroid.pos.y += asteroid.vel.y * secs + ag.y;
-		//Tracker.track("ASteroid : " + asteroid.pos.x);
+
+	var that = this;
+	var collisionResolver = function(item, collidables, i) {
+		that.resolveCollision(item, collidables[i]);
+	};
+
+
+	var len = this.gameModel.asteroids.length;
+	for (var a = 0; a < len; a++) {
+		var asteroid = this.gameModel.asteroids[a];
+		var asteroidsInGrid = this.grid.getType('asteroid', asteroid);
+
+		this.checkCollisionsMK2(asteroid, asteroidsInGrid, collisionResolver);
+
 	}
 };
+
+
 
 Asteroids.prototype.createAsteroids = function(num) {
 	num = num || 100;

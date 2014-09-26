@@ -10,20 +10,22 @@ function Projectile(options, type) {
 
 Projectile.prototype = new Base();
 
-Projectile.prototype.update = function(secs) {
-	
+Projectile.prototype.move = function(secs) {
+
 	var ships = this.gameModel.ships;
 	var asteroids = this.gameModel.asteroids;
 
-	for (var shipIndex = ships.length; shipIndex--; ) {
+	for (var shipIndex = ships.length; shipIndex--;) {
 
 		var ship = ships[shipIndex];
 		var projectiles = ship[this.type];
 
-		for (var projectileIndex = projectiles.length; projectileIndex--; ) {
+		for (var projectileIndex = projectiles.length; projectileIndex--;) {
 
 			var projectile = projectiles[projectileIndex];
 
+
+			//only for rockets
 			var targetId = projectile.targetId;
 			if (targetId !== undefined) {
 				var targets = this.getTargetsInRange(projectile.pos, projectile.scanRadius, ship.id, true);
@@ -46,7 +48,7 @@ Projectile.prototype.update = function(secs) {
 				}
 			}
 
-				this.applyNewPositions(projectile, direction, secs);
+			this.applyNewPositions(projectile, direction, secs);
 
 
 			if (projectile.pos.x >= this.SW || projectile.pos.x < 0 || projectile.pos.y < 0 || projectile.pos.y >= this.SH) {
@@ -54,7 +56,32 @@ Projectile.prototype.update = function(secs) {
 				continue;
 			}
 
-		
+
+			/*
+			if (this.checkCollisions(projectiles, projectileIndex, ships, shipIndex)) {
+				continue;
+			}
+			if (this.checkCollisions(projectiles, projectileIndex, asteroids)) {
+				continue;
+			}*/
+
+		}
+	}
+
+};
+
+Projectile.prototype.collide = function() {
+
+	/*var ships = this.gameModel.ships;
+	var asteroids = this.gameModel.asteroids;
+
+	for (var shipIndex = ships.length; shipIndex--;) {
+
+		var ship = ships[shipIndex];
+		var projectiles = ship[this.type];
+
+		for (var projectileIndex = projectiles.length; projectileIndex--;) {
+
 
 			if (this.checkCollisions(projectiles, projectileIndex, ships, shipIndex)) {
 				continue;
@@ -64,8 +91,51 @@ Projectile.prototype.update = function(secs) {
 			}
 
 		}
-	}
+	}*/
+	var that = this;
+	var shipCollision = function(item, collidables, i, options) {
+		options.projectiles.splice(options.projectileIndex, 1);
+		var ship = collidables[i];
+		if (ship.handleCollision(item)) {
+			that.createExplosion(ship.diam * 5, ship.pos);
+		}
+	};
+	var asteroidCollision = function(item, collidables, i, options) {
+		var asteroid = collidables[i];
+		that.createExplosion(asteroid.diam * 5, asteroid.pos);
+		collidables.splice(i, 1);
+		options.projectiles.splice(options.projectileIndex, 1);
 
+	};
+
+
+	var ships = this.gameModel.ships;
+	var asteroids = this.gameModel.asteroids;
+
+	for (var shipIndex = ships.length; shipIndex--;) {
+
+		var ship = ships[shipIndex];
+		var projectiles = ship[this.type];
+
+
+		for (var projectileIndex = projectiles.length; projectileIndex--;) {
+
+			var projectile = projectiles[projectileIndex];
+			var shipsInGrid = this.grid.getType('ship', projectile);
+			var asteroidsInGrid = this.grid.getType('asteroid', projectile);
+
+			this.checkCollisionsMK2(projectile, shipsInGrid, shipCollision, {
+				projectiles: projectiles,
+				projectileIndex: projectileIndex
+			});
+			this.checkCollisionsMK2(projectile, asteroidsInGrid, asteroidCollision, {
+				projectiles: projectiles,
+				projectileIndex: projectileIndex,
+				asteroids: asteroids //must splice from the "real" asteroids list
+
+			});
+		}
+	}
 };
 
 module.exports = Projectile;

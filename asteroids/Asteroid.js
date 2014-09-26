@@ -5,7 +5,7 @@ function Asteroid() {
 	this.diam = 0;
 	this.rot = 0;
 	this.rotVelocity = Math.random() - 0.5;
-
+	this.type = 'asteroid';
 
 	BasePhysics.apply(this);
 

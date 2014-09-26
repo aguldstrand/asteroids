@@ -7,10 +7,12 @@ var Asteroids = require('./server/Asteroids');
 var Ships = require('./server/Ships');
 var Explosions = require('./server/Explosions');
 var Gravity = require('./server/Gravity');
+
 //var Bullets = require('./server/Bullets');
 var Drones = require('./server/Drones');
 //var Rockets = require('./server/Rockets');
 var Projectiles = require('./server/Projectiles');
+var Grid = require('./server/Grid');
 
 function GameLoop(options) {
 	this.gameModel = options.gameModel;
@@ -67,7 +69,11 @@ GameLoop.prototype.init = function() {
 	this.gameModel.gravity = gravity;
 	this.gameModel.staticGravity = staticGravity;
 
-
+	this.grid = new Grid({
+		SW: this.SW,
+		SH: this.SH,
+		types: ['rocket', 'bullet', 'asteroid', 'ship']
+	});
 
 	var options = {
 		gm: this.gameModel,
@@ -75,7 +81,8 @@ GameLoop.prototype.init = function() {
 		staticGravity: this.staticGravity,
 		gravityRes: this.gravityRes,
 		SW: this.SW,
-		SH: this.SH
+		SH: this.SH,
+		grid: this.grid
 	};
 	this.asteroids = new Asteroids(options);
 	this.ships = new Ships(options);
@@ -85,6 +92,8 @@ GameLoop.prototype.init = function() {
 	this.drones = new Drones(options);
 	this.rockets = new Projectiles(options, 'rockets');
 	this.bullets = new Projectiles(options, 'bullets');
+
+
 };
 
 GameLoop.prototype.degreesToRadians = function(degrees) {
@@ -96,7 +105,7 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
 
 	var numExplosions = this.gameModel.explosions.length;
-	var numShips = this.gameModel.ships.length;
+
 	var numAsteroids = this.gameModel.asteroids.length;
 	var shipAcc = new Point();
 
@@ -109,20 +118,43 @@ GameLoop.prototype.update = function(step /* milliseconds */ ) {
 
 	var secs = step / 1000;
 
-	//this.ships.log('before');
-	this.asteroids.update(secs);
-	//this.ships.log('post asteroids');
-	this.ships.update(secs);
-	//this.ships.log('post ships');
-	this.explosions.update(secs);
-	//this.ships.log('post explosions');
-	this.gravity.update(secs);
-	//this.ships.log('post gravity');
-	this.bullets.update(secs);
-	//this.ships.log('post bullets');
+	/*
+	this.asteroids.update(secs);	
+	this.ships.update(secs);	
+	this.explosions.update(secs);	
+	this.gravity.update(secs);	
+	this.bullets.update(secs);	
 	this.drones.update(secs);
-	//this.ships.log('post drones');
 	this.rockets.update(secs);
+*/
+
+	this.explosions.update(secs);
+	this.gravity.update(secs);
+
+	this.asteroids.move(secs);
+	this.ships.move(secs);
+	this.bullets.move(secs);
+	this.drones.move(secs);
+	this.rockets.move(secs);
+
+	this.grid.reset();
+
+	var numShips = this.gameModel.ships.length;
+	for (var i = 0; i < numShips; i++) {
+		var ship = this.gameModel.ships[i];
+		this.grid.add('bullet', ship.bullets);
+		this.grid.add('rocket', ship.rockets);
+	}
+	this.grid.add('ship', this.gameModel.ships);
+	this.grid.add('asteroid', this.gameModel.asteroids);
+
+
+
+	this.asteroids.collide(secs);
+	this.ships.collide(secs);
+	this.bullets.collide(secs);
+	//this.drones.collide(secs); 
+	this.rockets.collide(secs);
 
 
 };
@@ -149,7 +181,7 @@ GameLoop.prototype.step = function() {
 		this.frameCounter++;
 		if (this.frameCounter % 100 === 0) {
 
-			var diff = process.hrtime(this.fpsLastTime);
+			diff = process.hrtime(this.fpsLastTime);
 			this.fpsLastTime = process.hrtime();
 			var _step = (100 / ((diff[0] * 1e9 + diff[1]) / 1e9)) | 0;
 

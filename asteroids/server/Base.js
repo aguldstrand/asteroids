@@ -11,6 +11,7 @@ function Base(options) {
 		this.gravityRes = options.gravityRes;
 		this.SW = options.SW;
 		this.SH = options.SH;
+		this.grid = options.grid;
 
 	}
 }
@@ -23,7 +24,7 @@ Base.prototype.radiansToDegrees = function(degrees) {
 	return degrees * 180 / Math.PI;
 };
 
-Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ , secs /*Number*/ ) {
+Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ , secs /*Number*/ , behaviour) {
 
 	var g = this.getGravity(obj.pos);
 
@@ -64,6 +65,31 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 
 	obj.pos.x += obj.vel.x * secs;
 	obj.pos.y += obj.vel.y * secs;
+
+
+	if (behaviour) {
+		behaviour(obj);
+	} else {
+		if (obj.pos.x > this.SW) {
+			obj.pos.x = 0;
+		}
+		if (obj.pos.y > this.SH) {
+			obj.pos.y = 0;
+		}
+
+		if (obj.pos.x < 0) {
+			obj.pos.x = this.SW - 1;
+		}
+		if (obj.pos.y < 0) {
+			obj.pos.y = this.SH - 1;
+		}
+	}
+
+
+	if (obj.pos.x > 3000 || obj.pos.x < 0 || obj.pos.y < 0 || obj.pos.y > 3000) {
+		console.log(obj);
+		throw 'fuck @ applyNewPositions';
+	}
 
 
 };
@@ -109,6 +135,35 @@ Base.prototype.resolveCollision = function(ballA, ballB) {
 	// change in momentum
 	ballA.vel = ballA.vel.add(impulse.multiply(im1));
 	ballB.vel = ballB.vel.subtract(impulse.multiply(im2));
+
+
+
+	if (ballA.pos.x > this.SW) {
+		ballA.pos.x = 0;
+	}
+	if (ballA.pos.y > this.SH) {
+		ballA.pos.y = 0;
+	}
+
+	if (ballA.pos.x < 0) {
+		ballA.pos.x = this.SW - 1;
+	}
+	if (ballA.pos.y < 0) {
+		ballA.pos.y = this.SH - 1;
+	}
+	if (ballB.pos.x > this.SW) {
+		ballB.pos.x = 0;
+	}
+	if (ballB.pos.y > this.SH) {
+		ballB.pos.y = 0;
+	}
+
+	if (ballB.pos.x < 0) {
+		ballB.pos.x = this.SW - 1;
+	}
+	if (ballB.pos.y < 0) {
+		ballB.pos.y = this.SH - 1;
+	}
 };
 
 Base.prototype.getGravity = function(pos /*Point*/ , log) {
@@ -328,6 +383,53 @@ Base.prototype.checkCollisions = function(sourceList, sourceIndex, targetList, e
 				sourceList.splice(sourceIndex, 1);
 				return true; // 'source dead'
 			}
+		}
+	}
+
+	return false; // 'still alive'
+};
+
+
+Base.prototype.checkCollisionsMK2 = function(item, collidables, behaviour, options) {
+
+
+	for (var i = collidables.length; i--;) {
+
+		var target = collidables[i];
+
+		if (target.cid === item.cid) {
+			continue;
+		}
+
+
+		var dx = target.pos.x - item.pos.x;
+		var dy = target.pos.y - item.pos.y;
+		var radi = target.diam + item.diam;
+
+		var dist = (dx * dx + dy * dy) - (radi * radi);
+
+		if (dist < 10) {
+
+			/*if (target.handleCollision(item)) {
+				//this.createExplosion(target.diam * 5, target.pos);
+			}
+
+			if (item.handleCollision(target)) {
+				//this.createExplosion(item.diam * 5, item.pos);
+			}*/
+
+			behaviour(item, collidables, i, options);
+
+
+			/*
+			if (!target.alive) {
+				targetList.splice(i, 1);
+			}
+
+			if (!item.alive) {
+				sourceList.splice(sourceIndex, 1);
+				return true; // 'source dead'
+			}*/
 		}
 	}
 

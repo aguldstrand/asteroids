@@ -4,22 +4,27 @@ var Point = require('../Point');
 function Rockets(options) {
 
 
+
+	/*** DEPRECATED ***/
+
+
+
 	Base.call(this, options);
 }
 
 Rockets.prototype = new Base();
 
-Rockets.prototype.update = function(secs) {
-	
+Rockets.prototype.move = function(secs) {
+
 	var ships = this.gameModel.ships;
 	var asteroids = this.gameModel.asteroids;
 
-	for (var shipIndex = ships.length; shipIndex--; ) {
+	for (var shipIndex = ships.length; shipIndex--;) {
 
 		var ship = ships[shipIndex];
 		var rockets = ship.rockets;
 
-		for (var rocketIndex = rockets.length; rocketIndex--; ) {
+		for (var rocketIndex = rockets.length; rocketIndex--;) {
 
 			var rocket = rockets[rocketIndex];
 

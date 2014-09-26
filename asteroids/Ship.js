@@ -11,6 +11,8 @@ function Ship(id, options) {
 	this.rockets = [];
 	this.drones = [new Drone(), new Drone()];
 	this.score = 0;
+	this.diam = 8;
+	this.type = 'ship';
 
 	this.spawnTimer = -1;
 	this.shieldHealth = [0, 0, 0, 0, 0, 0, 0, 0];

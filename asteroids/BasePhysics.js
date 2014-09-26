@@ -3,9 +3,12 @@ var Point = require("./Point");
 function BasePhysics() {
 	this.friction = 25;
 	this.maxVel = 200;
+	this.diam = 1;
 	this.pos = new Point();
 	this.vel = new Point();
 	this.acc = new Point();
+
+	this.cid = BasePhysics.cid++;
 
 	this.alive = true;
 
@@ -13,6 +16,8 @@ function BasePhysics() {
 	this.d_vel = [];
 	this.d_acc = [];
 }
+
+BasePhysics.cid = 0;
 
 
 BasePhysics.prototype.init = function(parentObject) {

@@ -26,7 +26,7 @@ Ships.prototype.log = function(msg) {
 	}
 };
 
-Ships.prototype.update = function(secs) {
+Ships.prototype.move = function(secs) {
 
 	var numShips = this.gameModel.ships.length;
 	var numBulletsInShip = 0;
@@ -145,51 +145,6 @@ Ships.prototype.update = function(secs) {
 
 
 
-		var len = this.gameModel.asteroids.length;
-		for (var j = 0; j < len; j++) {
-			var collidable = this.gameModel.asteroids[j];
-			var dx = collidable.pos.x - ship.pos.x;
-			var dy = collidable.pos.y - ship.pos.y;
-			var radi = collidable.diam + ship.diam;
-
-
-
-			// var dist = ((dx * dx) + (dy * dy)) - (radi * radi);
-
-			var dist = Math.sqrt(dx * dx + dy * dy) - radi;
-
-			if (dist < -5) {
-
-
-				//var hasShield = this.shieldCollision(ship);
-				ship.handleCollision( /*other*/ );
-
-				if (!ship.alive) {
-
-
-					this.gameModel.asteroids.splice(j, 1);
-					j--;
-					len--;
-
-					//this.resetShip(ship, collidable);
-					var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
-					this.createExplosion((collidable.diam || 200) * 5, explosionOrigin);
-
-
-					/*
-					var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
-					this.createExplosion(collidable.diam * 5, explosionOrigin);					
-					ship.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
-					ship.shieldStarter = 64;*/
-				} else {
-					this.resolveCollision(collidable, ship);
-
-				}
-				break;
-			}
-			// logger.log(dist2);
-		}
-
 		if (ship.shieldStarter) {
 			for (var ss = 0; ss < 8; ss++) {
 				var shieldPart = ship.shieldHealth[ss];
@@ -204,62 +159,64 @@ Ships.prototype.update = function(secs) {
 
 
 
-		//ship.pos.x += ship.vel.x*secs + g.x;
-		//ship.pos.y += ship.vel.y*secs + g.y;
-
-
-		/*
-		for (var mb = 0; mb < numBulletsInShip; mb++) {
-			var bullet = ship.bullets[mb];
-
-			for (var bs = 0; bs < numShips; bs++) {
-				if (bs !== s) {
-					var collidableShip = this.gameModel.ships[bs];
-
-					var __dx = collidableShip.pos.x - bullet.pos.x;
-					var __dy = collidableShip.pos.y - bullet.pos.y;
-					var __dist = Math.sqrt(__dx * __dx + __dy * __dy) - 40;
-
-					if (__dist < 0) {
-						var __hasShield = this.shieldCollision(collidableShip);
-						if (!__hasShield) {
-							this.resetShip(collidableShip, bullet);
-							ship.bullets.splice(mb, 1);
-							numBulletsInShip--;
-							mb--;
-						}
-					}
-
-				}
-
-			}
-
-
-
-			if (bullet.pos.x >= this.SW || bullet.pos.x < 0 || bullet.pos.y < 0 || bullet.pos.y >= this.SH) {
-				//GameModel.getInstance().bullets.splice(mb, 1);
-				ship.bullets.splice(mb, 1);
-				numBulletsInShip--;
-				mb--;
-				//
-			} else {
-				//var gb:Point = gravity[int( int(bullet.pos.x / gravityRes) + int(bullet.pos.y / gravityRes) * int(SW / gravityRes))];
-				//bullet.vel.x += gb.x;
-				//bullet.vel.y += gb.y;
-
-				this.applyNewPositions(bullet, new Point(), secs);
-				//bullet.pos.x += Math.sin(bullet.direction * piOver180 ) * bulletSpeed * secs + gb.x;
-				//bullet.pos.y -= Math.cos(bullet.direction * piOver180 ) * bulletSpeed * secs - gb.y;	
-			}
-			//
-		}*/
-
-
-
 	}
+
+
+	Ships.prototype.collide = function(secs) {
+		var numShips = this.gameModel.ships.length;
+		var numAsteroids = this.gameModel.asteroids.length;
+		for (var s = 0; s < numShips; s++) {
+			var ship = this.gameModel.ships[s];
+
+			for (var j = 0; j < numAsteroids; j++) {
+				var collidable = this.gameModel.asteroids[j];
+				var dx = collidable.pos.x - ship.pos.x;
+				var dy = collidable.pos.y - ship.pos.y;
+				var radi = collidable.diam + ship.diam;
+
+
+
+				// var dist = ((dx * dx) + (dy * dy)) - (radi * radi);
+
+				var dist = Math.sqrt(dx * dx + dy * dy) - radi;
+
+				if (dist < -5) {
+
+
+					//var hasShield = this.shieldCollision(ship);
+					ship.handleCollision( /*other*/ );
+
+					if (!ship.alive) {
+
+
+						this.gameModel.asteroids.splice(j, 1);
+						j--;
+						numAsteroids--;
+
+						//this.resetShip(ship, collidable);
+						var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
+						this.createExplosion((collidable.diam || 200) * 5, explosionOrigin);
+
+
+						/*
+					var explosionOrigin = new Point((ship.pos.x + collidable.pos.x) / 2, (ship.pos.y + collidable.pos.y) / 2);
+					this.createExplosion(collidable.diam * 5, explosionOrigin);					
+					ship.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);
+					ship.shieldStarter = 64;*/
+					} else {
+						this.resolveCollision(collidable, ship);
+
+					}
+					break;
+				}
+				// logger.log(dist2);
+			}
+		}
+	};
 
 	Ships.prototype.shieldCollision = function(ship) {
 		var hasShield = false;
+
 		for (var x = 0; x < 8; x++) {
 			var shieldFragment = ship.shieldHealth[x];
 			if (shieldFragment > 0) {
