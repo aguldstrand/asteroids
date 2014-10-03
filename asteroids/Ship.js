@@ -11,6 +11,7 @@ function Ship(id, options) {
 	this.rockets = [];
 	this.drones = [new Drone(), new Drone()];
 	this.score = 0;
+
 	this.diam = 8;
 	this.type = 'ship';
 
@@ -78,6 +79,7 @@ Ship.prototype.toJSON = function() {
 		bullets: this.bullets,
 		rockets: this.rockets,
 		drones: this.drones,
+		color: this.color,
 		shieldHealth: this.shieldHealth,
 		collidePos: this.collidePos
 	};

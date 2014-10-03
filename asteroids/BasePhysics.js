@@ -7,6 +7,7 @@ function BasePhysics() {
 	this.pos = new Point();
 	this.vel = new Point();
 	this.acc = new Point();
+	this.splice = false;
 
 	this.cid = BasePhysics.cid++;
 

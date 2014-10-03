@@ -7,7 +7,10 @@ define([
 	'monitor/gui/objects/Debug',
 	'monitor/gui/objects/MiniMap',
 
-	'monitor/gui/objects/Explosions'
+	'monitor/gui/objects/Camera',
+
+	'monitor/gui/objects/Explosions',
+	'hektorskraffs/webgl'
 ], function(
 	Bifrost,
 	Poly,
@@ -16,7 +19,11 @@ define([
 	Asteroids,
 	Debug,
 	MiniMap,
-	Explosions) {
+
+	Camera,
+
+	Explosions,
+	WebGL) {
 
 	function ScreenComponent(options) {
 		if (options) {
@@ -44,14 +51,23 @@ define([
 		this.asteroids = new Asteroids(this.pixel, this.SW, this.SH);
 		this.debug = new Debug(this.pixel, this.SW, this.SH);
 		this.miniMap = new MiniMap(this.pixel, this.SW, this.SH);
+
+		this.camera = new Camera();
 	};
 
 
 	ScreenComponent.prototype.init = function() {
 		// Get A WebGL context
+		/*
 		var canvas = this.canvas;
 		var gl = canvas.getContext('webgl');
 		window.gl = gl;
+
+		WebGL.init(gl);
+		this.colorProgram = WebGL.loadProgram('monitor/gui/shaders/color.vert', 'monitor/gui/shaders/color.frag', ['a_position'], ['u_color', 'u_position', 'u_rotation', 'u_scale', 'u_resolution', 'u_camera']);
+
+
+
 		//var gl = getWebGLContext(canvas);
 		if (!gl) {
 			console.error('no GL');
@@ -79,7 +95,18 @@ define([
 		var buffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 		gl.enableVertexAttribArray(positionLocation);
-		gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);*/
+		var canvas = this.canvas;
+
+		if (!WebGL.init(canvas)) {
+			console.error('no GL');
+			return;
+		}
+		window.gl = WebGL.gl;
+		this.gl = WebGL.gl;
+
+		this.colorProgram = WebGL.loadProgram('monitor/gui/shaders/color.vert', 'monitor/gui/shaders/color.frag', ['a_position'], ['u_color', 'u_position', 'u_rotation', 'u_scale', 'u_resolution', 'u_camera']);
+
 	};
 
 
@@ -155,15 +182,6 @@ define([
 		numPolys = this.explosions.update(step, polys, gameState.explosions);
 		this.draw(polys, numPolys, 1, 1, 0, 1);
 
-		//SHIPS (other)
-		polys = [];
-		numPolys = this.ships.update(step, polys, gameState.ships, activeShip, false);
-		this.draw(polys, numPolys, 1, 0, 0, 1);
-
-		//SHIPS (yours)
-		polys = [];
-		numPolys = this.ships.update(step, polys, gameState.ships, activeShip, true);
-		this.draw(polys, numPolys, 0, 1, 0, 1);
 
 
 		//Asteroids
@@ -203,6 +221,78 @@ define([
 
 	};
 
+	ScreenComponent.prototype.drawing = function(step, gameState) {
+
+		//focus
+		var focusPoint = {
+			x: 0,
+			y: 0
+		};
+		var activeShip = null;
+		if (gameState.ships && gameState.ships.length > 0) {
+			var len = gameState.ships.length;
+
+			for (var i = 0; i < len; i++) {
+				var ship = gameState.ships[i];
+				if (ship.id === window.io.socket.sessionid) {
+					activeShip = ship;
+					break;
+				}
+			}
+			if (activeShip) {
+				focusPoint.x = activeShip.pos.x - this.SW * 0.5;
+				focusPoint.y = activeShip.pos.y - this.SH * 0.5;
+				if (focusPoint.x < 0) {
+					focusPoint.x = 0;
+				}
+				if (focusPoint.x > gameState.SW - this.SW) {
+					focusPoint.x = gameState.SW - this.SW;
+				}
+				if (focusPoint.y < 0) {
+					focusPoint.y = 0;
+				}
+				if (focusPoint.y > gameState.SH - this.SH) {
+					focusPoint.y = gameState.SH - this.SH;
+				}
+			}
+		}
+
+
+		var numExplosions = gameState.explosions.length;
+		if (numExplosions > 0) {
+			focusPoint.y += (Math.random() - 0.5) * numExplosions * 30;
+			focusPoint.x += (Math.random() - 0.5) * numExplosions * 30;
+		}
+
+
+
+		this.camera.setTargetPosition(focusPoint.x, focusPoint.y);
+
+
+
+		if (!WebGL.useProgram(this.colorProgram)) {
+			return;
+		}
+
+		var program = this.colorProgram;
+		var camera = this.camera;
+
+		window.tracker.outFixed('camera', focusPoint.x + ',' + focusPoint.y);
+		window.tracker.outFixed('ship', activeShip.pos.x + ',' + activeShip.pos.y);
+
+		this.camera.update();
+
+		WebGL.beginDraw([0.0, 0.0, 0.0, 1.0]);
+
+
+		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
+
+		this.ships.draw(program, gameState.ships);
+		this.asteroids.draw(program, gameState.asteroids);
+
+
+	};
+
 
 	ScreenComponent.prototype.draw = function(polys, numPolys, red, green, blue, alpha) {
 		var gl = this.gl;
@@ -231,9 +321,36 @@ define([
 
 		this.canvas = canvas;
 
-		this.setup();
-		this.init();
 
+		this.init();
+		this.setup();
+		this.resize();
+
+	};
+
+	ScreenComponent.prototype.resize = function() {
+		var canvas = this.canvas;
+
+		var width = window.innerWidth;
+		var height = window.innerHeight;
+
+		canvas.width = width;
+		canvas.height = height;
+
+		//this.pixel = (canvas.width + canvas.height) * 0.0025;
+
+		this.screenWidth = parseInt(width / this.pixel, 10);
+		this.screenHeight = parseInt(height / this.pixel, 10);
+
+
+		this.camera.resize(width, height);
+	};
+
+	ScreenComponent.prototype.events = {
+		'window': [{
+			event: ['resize'],
+			handler: 'resize'
+		}]
 	};
 
 	return ScreenComponent;

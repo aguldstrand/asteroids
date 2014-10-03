@@ -127,7 +127,7 @@ Grid.prototype.getType = function(type, item) {
 
 	if (item.pos.x > 3000 || item.pos.x < 0 || item.pos.y < 0 || item.pos.y > 3000) {
 		console.log(item);
-		throw 'fuck';
+		throw 'fuck, accessed item outside map,';
 	}
 
 

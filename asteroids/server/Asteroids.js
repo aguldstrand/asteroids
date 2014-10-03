@@ -12,8 +12,12 @@ Asteroids.prototype = new Base();
 
 Asteroids.prototype.move = function(secs) {
 	var len = this.gameModel.asteroids.length;
-	for (var a = 0; a < len; a++) {
+	for (var a = this.gameModel.asteroids.length; a--;) {
 		var asteroid = this.gameModel.asteroids[a];
+
+		if (asteroid.splice) {
+			this.gameModel.asteroids.splice(a, 1);
+		}
 
 		//asteroid.pos.x %= this.SW;
 		//asteroid.pos.y %= this.SH;

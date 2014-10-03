@@ -24,6 +24,10 @@ Projectile.prototype.move = function(secs) {
 
 			var projectile = projectiles[projectileIndex];
 
+			if (projectile.splice) {
+				projectiles.splice(projectileIndex, 1);
+			}
+
 
 			//only for rockets
 			var targetId = projectile.targetId;
@@ -94,17 +98,23 @@ Projectile.prototype.collide = function() {
 	}*/
 	var that = this;
 	var shipCollision = function(item, collidables, i, options) {
-		options.projectiles.splice(options.projectileIndex, 1);
+
 		var ship = collidables[i];
 		if (ship.handleCollision(item)) {
 			that.createExplosion(ship.diam * 5, ship.pos);
 		}
+
+		var projectile = options.projectiles[options.projectileIndex];
+		projectile.splice = true;
 	};
 	var asteroidCollision = function(item, collidables, i, options) {
 		var asteroid = collidables[i];
+		asteroid.splice = true;
 		that.createExplosion(asteroid.diam * 5, asteroid.pos);
 		collidables.splice(i, 1);
-		options.projectiles.splice(options.projectileIndex, 1);
+
+		var projectile = options.projectiles[options.projectileIndex];
+		projectile.splice = true;
 
 	};
 

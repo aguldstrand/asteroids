@@ -15,7 +15,8 @@
 			// 'Bifrost': 'libs/bifrost/dist/Bifrost.min',
 			'handlebars': 'libs/bifrost/dist/handlebars.runtime',
 
-			'hb': 'libs/bifrost/dist/hb'
+			'hb': 'libs/bifrost/dist/hb',
+			'glmatrix': 'libs/glmatrix/gl-matrix'
 
 		}
 	});

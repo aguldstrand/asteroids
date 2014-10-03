@@ -82,7 +82,7 @@ define([
 
 		this.time = current;
 		if (this.gameState) {
-			this.components.screen.update(step, this.gameState);
+			this.components.screen.drawing(step, this.gameState);
 		}
 
 
