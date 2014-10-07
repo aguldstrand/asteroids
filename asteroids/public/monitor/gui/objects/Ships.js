@@ -12,22 +12,7 @@ define([
 		this.SH = SH;
 		this.SW = SW;
 
-		this.epp = [{
-			x: 0,
-			y: 0
-		}, {
-			x: 0,
-			y: 0
-		}, {
-			x: 0,
-			y: 0
-		}, {
-			x: 0,
-			y: 0
-		}, {
-			x: 0,
-			y: 0
-		}];
+		this.epp = [];
 		this.localHash = {};
 
 
@@ -75,21 +60,11 @@ define([
 
 
 
-	Ships.prototype.rotate_point = function(point, angle) {
-		angle = angle * Math.PI / 180.0;
-		return {
-			x: Math.cos(angle) * point.x - Math.sin(angle) * point.y,
-			y: Math.sin(angle) * point.x + Math.cos(angle) * point.y
-		};
-	};
-
-
-
 	Ships.prototype.draw = function(program, ships) {
 
 		this.ds_rotation -= 1.5;
 
-		var polygon = this.shipPolygon;
+
 		var uniforms = program.uniforms;
 
 
@@ -127,7 +102,7 @@ define([
 			}
 			//SHIELD
 			WebGL.bindAttribBuffer(this.shieldPolygon.vertexBuffer, program.attributes.a_position, this.shieldPolygon.itemSize);
-			var damageReflection = {};
+
 			for (var j = 0; j < 8; j++) {
 				var shieldHealth = ship.shieldHealth[j];
 				if (shieldHealth > 0) {
@@ -178,8 +153,8 @@ define([
 				var rocket = ship.rockets[j];
 
 				gl.uniform2f(positionLocation, rocket.pos.x, rocket.pos.y);
-				gl.uniform1f(rotationLocation, rocket.rot * DEG_TO_RAD);
-				gl.uniform2f(scaleLocation, 10.0, 10.0);
+				gl.uniform1f(rotationLocation, Math.atan2(-rocket.vel.y, -rocket.vel.x) - Math.PI);
+				gl.uniform2f(scaleLocation, 25.0, 10.0);
 
 				gl.drawArrays(gl.TRIANGLES, 0, this.bulletPolygon.vertexCount);
 			}
@@ -248,7 +223,7 @@ define([
 	};
 
 	Ships.prototype.___eppResetAnimation = function(epp) {
-		var evel = 19;
+
 		var len = epp.length;
 
 		var fullReset = false;
@@ -277,7 +252,7 @@ define([
 	};
 
 	Ships.prototype.___eppReset = function(epp) {
-		var evel = 19;
+
 		var len = 5;
 
 

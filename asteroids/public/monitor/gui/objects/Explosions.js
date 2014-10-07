@@ -1,4 +1,4 @@
-define(['monitor/gui/objects/Poly'], function(Poly) {
+define(['hektorskraffs/webgl'], function(WebGL) {
 	function Explosions(pixel, SH, SW) {
 		this.pixelPoints = [];
 		this.pixel = pixel;
@@ -6,12 +6,85 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 		this.SW = SW;
 
 		this.expHash = {};
+		this.load();
+
 	}
 
-	Explosions.prototype.update = function(step, polys, explosions) {
 
-		var numPolys = 0;
-		var pixel = this.pixel;
+	Explosions.prototype.load = function() {
+
+		this.color = [0.0, 1.0, 1.0, 1];
+
+	};
+
+
+	Explosions.prototype.draw = function(program, gameModel) {
+
+
+		/*lineVertexPositionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexPositionBuffer);
+		var vertices = new Array(LINES * 6);
+
+		var milliSeconds = ((time.getHours() * 3600) + (time.getMinutes() * 60) + time.getSeconds() * 1000) + time.getMilliseconds();
+
+		for (j = 0; j < milliSeconds; j++) {
+			random.Get();
+		}
+
+		// Initialize the lines
+		for (var j = 0; j < LINES; j++) {
+
+		}
+
+		leader = Math.round((LINES / 2) + (random.Get() * (LINES / 2)));
+		viewer = Math.round((LINES / 2) + (random.Get() * (LINES / 2)));
+
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+		lineVertexPositionBuffer.itemSize = 3;
+		lineVertexPositionBuffer.numItems = 2 * LINES;
+*/
+
+
+		var vertices = this.update(gameModel.explosions);
+
+		var uniforms = program.uniforms;
+
+
+
+		var positionLocation = uniforms.u_position;
+		var rotationLocation = uniforms.u_rotation;
+		var scaleLocation = uniforms.u_scale;
+
+		var DEG_TO_RAD = Math.PI / 180.0;
+
+		var gl = WebGL.gl;
+
+
+
+		//WebGL.bindAttribBuffer(this.polygon.vertexBuffer, program.attributes.a_position, this.polygon.itemSize);
+
+		WebGL.bindUniform(uniforms.u_color, this.color);
+
+
+		//window.tracker.outFixed(s, epp[s].x + ' ' + epp[s].y + ' ' + epp[s].r);
+
+		/*gl.uniform2f(positionLocation, focusPoint.x + ship.pos.x * scale, focusPoint.y + ship.pos.y * scale);
+
+		gl.uniform1f(rotationLocation, ship.rot * DEG_TO_RAD);
+
+
+		gl.uniform2f(scaleLocation, 10, 10);*/
+
+		gl.drawArrays(gl.LINES, 0, vertices, vertices.length / 4);
+
+
+
+	};
+
+	Explosions.prototype.update = function(explosions) {
+		var vertices = [];
+
+
 		var piOver180 = Math.PI / 180;
 		var pp = {
 			p: {}
@@ -19,7 +92,7 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 
 		var explosion = null;
 		var explosionSize = null;
-		var ppCnt = 0;
+
 		for (var i = 0; i < explosions.length; i++) {
 			explosion = explosions[i];
 			explosionSize = explosion.size;
@@ -61,30 +134,19 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 
 
 
-					numPolys += Poly.add(posX, posY, pixel, pixel, polys, false, Poly.TL);
-					ppCnt++;
+					if (this.pixelPoints.length < 6000) {
+						pp = {
+							p: {}
+						};
+						//pp.color = 0xFFFFFF;
 
-					if (explosionSize > 150) {
-						numPolys += Poly.add(posX + 2, posY, pixel, pixel, polys, false, Poly.TL);
-						numPolys += Poly.add(posX, posY + 2, pixel, pixel, polys, false, Poly.TL);
-						numPolys += Poly.add(posX + 2, posY + 2, pixel, pixel, polys, false, Poly.TL);
+						pp.p.x = posX;
+						pp.p.y = posY;
+						pp.life = Math.random() * 100 + 20;
+						pp.drift = Math.random() * 10 - 5;
+						pp.fall = Math.random() * 3 + 2;
+						this.pixelPoints.push(pp);
 
-
-						if (ppCnt > 1) {
-							ppCnt = 0;
-							if (this.pixelPoints.length < 6000) {
-								pp = {
-									p: {}
-								};
-								//pp.color = 0xFFFFFF;
-								pp.p.x = posX;
-								pp.p.y = posY;
-								pp.life = Math.random() * 100 + 20;
-								pp.drift = Math.random() * 10 - 5;
-								pp.fall = Math.random() * 3 + 2;
-								this.pixelPoints.push(pp);
-							}
-						}
 					}
 				}
 
@@ -125,9 +187,8 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 				pp.drift--;
 			}
 
-			//pp.color -= .00001;
-			numPolys += Poly.add(pp.p.x, pp.p.y, pixel, pixel, polys, false, Poly.TL);
 
+			vertices.push(pp.p.x, pp.p.y, pp.p.x + pp.drift, pp.p.y + pp.fall);
 
 			if (pp.life < 0) {
 				ppLen--;
@@ -135,7 +196,9 @@ define(['monitor/gui/objects/Poly'], function(Poly) {
 			}
 		}
 
-		return numPolys;
+		return vertices;
+
+
 	};
 
 	return Explosions;

@@ -275,10 +275,10 @@ define([
 		}
 
 		var program = this.colorProgram;
-		var camera = this.camera;
 
-		window.tracker.outFixed('camera', focusPoint.x + ',' + focusPoint.y);
-		window.tracker.outFixed('ship', activeShip.pos.x + ',' + activeShip.pos.y);
+
+		//window.tracker.outFixed('camera', focusPoint.x + ',' + focusPoint.y);
+		//window.tracker.outFixed('ship', activeShip.pos.x + ',' + activeShip.pos.y);
 
 		this.camera.update();
 
@@ -287,8 +287,11 @@ define([
 
 		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
 
+		this.debug.draw(program, gameState.gravity);
 		this.ships.draw(program, gameState.ships);
 		this.asteroids.draw(program, gameState.asteroids);
+		this.miniMap.draw(program, gameState, focusPoint, activeShip.id);
+		this.explosions.draw(program, gameState);
 
 
 	};
