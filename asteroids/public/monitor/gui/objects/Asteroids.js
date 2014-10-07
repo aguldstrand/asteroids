@@ -18,7 +18,7 @@ define([
 			y: 0
 		};
 
-		this.color = [0.5, 0.5, 0.5, 1];
+		this.color = [1, 1, 1, 1];
 
 		this.load();
 	}

@@ -45,6 +45,18 @@ define(['monitor/gui/objects/Poly',
 		var gravityRes = 50;
 
 
+		/*WebGL.bindAttribBuffer(this.gravityBeamVertices.vertexBuffer, program.attributes.a_position, this.gravityBeamVertices.itemSize);
+		WebGL.bindUniform(uniforms.u_color, [0, 0, 0, 0.01]);
+
+		
+
+		gl.uniform2f(positionLocation, 0, 0);
+		gl.uniform1f(rotationLocation, 0);
+		gl.uniform2f(scaleLocation, 100000, 100000);
+
+		gl.drawArrays(gl.TRIANGLES, 0, this.gravityBeamVertices.vertexCount);*/
+
+
 
 		var yMax = parseInt(3000 / gravityRes, 10);
 		var xMax = parseInt(3000 / gravityRes, 10);

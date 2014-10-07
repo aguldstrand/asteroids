@@ -47,6 +47,8 @@ define(['hektorskraffs/webgl'], function(WebGL) {
 
 		var vertices = this.update(gameModel.explosions);
 
+		var vertPol = WebGL.createPolygon(vertices);
+
 		var uniforms = program.uniforms;
 
 
@@ -61,21 +63,19 @@ define(['hektorskraffs/webgl'], function(WebGL) {
 
 
 
-		//WebGL.bindAttribBuffer(this.polygon.vertexBuffer, program.attributes.a_position, this.polygon.itemSize);
+		WebGL.bindAttribBuffer(vertPol.vertexBuffer, program.attributes.a_position, vertPol.itemSize);
 
 		WebGL.bindUniform(uniforms.u_color, this.color);
 
 
 		//window.tracker.outFixed(s, epp[s].x + ' ' + epp[s].y + ' ' + epp[s].r);
 
-		/*gl.uniform2f(positionLocation, focusPoint.x + ship.pos.x * scale, focusPoint.y + ship.pos.y * scale);
+		gl.uniform2f(positionLocation, 0, 0);
+		gl.uniform1f(rotationLocation, 0);
+		gl.uniform2f(scaleLocation, 1, 1);
 
-		gl.uniform1f(rotationLocation, ship.rot * DEG_TO_RAD);
 
-
-		gl.uniform2f(scaleLocation, 10, 10);*/
-
-		gl.drawArrays(gl.LINES, 0, vertices, vertices.length / 4);
+		gl.drawArrays(gl.LINES, 0, vertPol.vertexCount);
 
 
 
@@ -134,7 +134,7 @@ define(['hektorskraffs/webgl'], function(WebGL) {
 
 
 
-					if (this.pixelPoints.length < 6000) {
+					if (this.pixelPoints.length < 2000) {
 						pp = {
 							p: {}
 						};
@@ -143,8 +143,8 @@ define(['hektorskraffs/webgl'], function(WebGL) {
 						pp.p.x = posX;
 						pp.p.y = posY;
 						pp.life = Math.random() * 100 + 20;
-						pp.drift = Math.random() * 10 - 5;
-						pp.fall = Math.random() * 3 + 2;
+						pp.drift = Math.random() * 50 - 25;
+						pp.fall = Math.random() * 20 - 15;
 						this.pixelPoints.push(pp);
 
 					}

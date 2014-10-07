@@ -10,7 +10,10 @@ define([
 	'monitor/gui/objects/Camera',
 
 	'monitor/gui/objects/Explosions',
-	'hektorskraffs/webgl'
+	'hektorskraffs/webgl',
+
+	'glmatrix',
+	'hektorskraffs/webgl-util'
 ], function(
 	Bifrost,
 	Poly,
@@ -23,7 +26,9 @@ define([
 	Camera,
 
 	Explosions,
-	WebGL) {
+	WebGL,
+	glmatrix,
+	Utils) {
 
 	function ScreenComponent(options) {
 		if (options) {
@@ -33,6 +38,11 @@ define([
 			this.SW = 0;
 			this.SH = 0;
 			this.pixel = 1;
+
+			this.oldFocusPoint = {
+				x: 0,
+				y: 0
+			};
 
 
 		}
@@ -104,8 +114,28 @@ define([
 		}
 		window.gl = WebGL.gl;
 		this.gl = WebGL.gl;
+		Utils.init(WebGL);
 
 		this.colorProgram = WebGL.loadProgram('monitor/gui/shaders/color.vert', 'monitor/gui/shaders/color.frag', ['a_position'], ['u_color', 'u_position', 'u_rotation', 'u_scale', 'u_resolution', 'u_camera']);
+		this.textureProgram = WebGL.loadProgram(
+			'monitor/gui/shaders/texture.vert', 'monitor/gui/shaders/texture_color.frag', ['a_position', 'a_texcoord'], ['u_resolution', 'u_position', 'u_scale', 'u_texture', 'u_color']
+		);
+		this.blendProgram = WebGL.loadProgram(
+			'monitor/gui/shaders/texture.vert', 'monitor/gui/shaders/blend.frag', ['a_position', 'a_texcoord'], ['u_resolution', 'u_position', 'u_scale', 'u_texture1', 'u_texture2', 'u_a1', 'u_a2']
+		);
+		this.blurProgram = WebGL.loadProgram(
+			'monitor/gui/shaders/texture.vert', 'monitor/gui/shaders/blur.frag', ['a_position', 'a_texcoord'], ['u_resolution', 'u_position', 'u_scale', 'u_texture', 'u_textureresolution', 'u_direction']
+		);
+		this.preglowProgram = WebGL.loadProgram(
+			'monitor/gui/shaders/texture.vert', 'monitor/gui/shaders/preglow.frag', ['a_position', 'a_texcoord'], ['u_resolution', 'u_position', 'u_scale', 'u_texture']
+		);
+
+		this.rtScene = WebGL.createRenderTarget(1024, 1024);
+
+		this.rtGlowSource = WebGL.createRenderTarget(1024, 1024);
+		var res = 8;
+		this.rtBlur1 = WebGL.createRenderTarget(1024 / res, 1024 / res);
+		this.rtBlur2 = WebGL.createRenderTarget(1024 / res, 1024 / res);
 
 	};
 
@@ -228,6 +258,11 @@ define([
 			x: 0,
 			y: 0
 		};
+
+		var shake = 0;
+
+
+
 		var activeShip = null;
 		if (gameState.ships && gameState.ships.length > 0) {
 			var len = gameState.ships.length;
@@ -260,8 +295,9 @@ define([
 
 		var numExplosions = gameState.explosions.length;
 		if (numExplosions > 0) {
-			focusPoint.y += (Math.random() - 0.5) * numExplosions * 30;
-			focusPoint.x += (Math.random() - 0.5) * numExplosions * 30;
+			shake = (Math.random() - 0.5) * numExplosions * 30;
+			focusPoint.y += shake;
+			focusPoint.x += shake;
 		}
 
 
@@ -282,16 +318,80 @@ define([
 
 		this.camera.update();
 
-		WebGL.beginDraw([0.0, 0.0, 0.0, 1.0]);
 
+		WebGL.setRenderTarget(this.rtScene);
+		//WebGL.beginDraw([0.0, 0.0, 0.0, 0.1]);
+		// debugger
 
 		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
 
+
+
+		//if (shake > 0) {
+		/*this.debug.draw(program, gameState.gravity);
+		this.ships.draw(program, gameState.ships);
+		this.asteroids.draw(program, gameState.asteroids);
+		this.explosions.draw(program, gameState);*/
+		//this.glowblur(shake * 0.1, shake * 0.1, 1);
+		//this.glowblur(focusPoint.x - this.oldFocusPoint.x, focusPoint.y - this.oldFocusPoint.y, 1);
+		/*} else {
+			this.explosions.draw(program, gameState);
+
+			this.glowblur(1.0, 1.0, 10);
+		}*/
 		this.debug.draw(program, gameState.gravity);
 		this.ships.draw(program, gameState.ships);
 		this.asteroids.draw(program, gameState.asteroids);
-		this.miniMap.draw(program, gameState, focusPoint, activeShip.id);
 		this.explosions.draw(program, gameState);
+		this.glowblur(1.0, 1.0, 10);
+
+
+
+		WebGL.setRenderTarget(null);
+
+		//Utils.drawRectangleColor(this.colorProgram, new Float32Array([0, 0]), new Float32Array([1, 1]), new Float32Array([0.0, 0.0, 0.0, 1.0]), new Float32Array([1, 1]));
+		//WebGL.beginDraw([0.0, 0.0, 0.0, 1.0]);
+
+		WebGL.useProgram(program);
+		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
+		this.debug.draw(program, gameState.gravity);
+		this.ships.draw(program, gameState.ships);
+		this.asteroids.draw(program, gameState.asteroids);
+		//this.glowblur(shake * 0.02, shake * 0.02);
+
+
+		WebGL.useProgram(program);
+		Utils.drawRectangleColor(this.colorProgram, [0, 0], [1, 1], [1.0, 0.0, 0.0, 0.1], [1, 1]);
+		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
+		this.miniMap.draw(program, gameState, focusPoint, activeShip.id);
+
+
+		this.oldFocusPoint = focusPoint;
+	};
+
+	ScreenComponent.prototype.glowblur = function(x, y, glow) {
+		WebGL.getTextureFromRenderTarget(this.rtScene);
+
+
+		Utils.renderTextureIntoTarget(this.preglowProgram, this.rtGlowSource, this.rtScene.frametexture);
+
+
+		// blur using the glow map
+		Utils.blurTextureIntoTarget(this.blurProgram, this.rtBlur1, this.rtGlowSource.frametexture, glmatrix.vec2.fromValues(x, 0.0));
+		Utils.blurTextureIntoTarget(this.blurProgram, this.rtBlur2, this.rtBlur1.frametexture, glmatrix.vec2.fromValues(0.0, y));
+
+
+		WebGL.setRenderTarget(null);
+		WebGL.beginDraw([0.0, 0.0, 0.0, 1.0]);
+
+		WebGL.useProgram(this.blendProgram);
+
+
+		WebGL.bindUniform(this.blendProgram.uniforms.u_a2, glow);
+		WebGL.bindUniform(this.blendProgram.uniforms.u_a1, 1);
+
+
+		Utils.drawRectangleTexture(this.blendProgram, glmatrix.vec2.fromValues(0, 0), glmatrix.vec2.fromValues(1, 1), [this.rtScene.frametexture, this.rtBlur2.frametexture], glmatrix.vec2.fromValues(1, 1));
 
 
 	};
