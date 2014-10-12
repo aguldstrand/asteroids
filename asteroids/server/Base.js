@@ -26,6 +26,11 @@ Base.prototype.radiansToDegrees = function(degrees) {
 
 Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ , secs /*Number*/ , behaviour) {
 
+	obj.checkOffMap();
+	if (obj.splice) {
+		return;
+	}
+
 	var g = this.getGravity(obj.pos);
 
 	if (g.warp) {

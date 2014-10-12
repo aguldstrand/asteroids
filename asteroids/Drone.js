@@ -17,4 +17,8 @@ Drone.prototype.toJSON = function() {
 	};
 };
 
+Drone.prototype.handleOffMap = function() {
+	this.handleOffMapWithWrap();
+};
+
 module.exports = Drone;

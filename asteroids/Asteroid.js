@@ -19,6 +19,10 @@ Asteroid.prototype.handleCollision = function(other) {
 	return true;
 };
 
+Asteroid.prototype.handleOffMap = function() {
+	this.handleOffMapWithWrap();
+};
+
 
 Asteroid.prototype.toJSON = function() {
 	return {

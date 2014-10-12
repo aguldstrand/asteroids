@@ -62,6 +62,10 @@ Ship.prototype.resetStuf = function() {
 	this.collidePos = null;
 };
 
+Ship.prototype.handleOffMap = function() {
+	this.handleOffMapWithWrap();
+};
+
 
 Ship.prototype.reset = function() {
 	this.pos = new Point(1000 + Math.random() * 200, 1000 + Math.random() * 200);

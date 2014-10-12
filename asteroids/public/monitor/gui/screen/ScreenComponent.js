@@ -320,7 +320,7 @@ define([
 
 
 		WebGL.setRenderTarget(this.rtScene);
-		//WebGL.beginDraw([0.0, 0.0, 0.0, 0.1]);
+		WebGL.beginDraw([0.0, 0.0, 0.0, 1]);
 		// debugger
 
 		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
@@ -339,29 +339,30 @@ define([
 
 			this.glowblur(1.0, 1.0, 10);
 		}*/
-		this.debug.draw(program, gameState.gravity);
+		/*this.debug.draw(program, gameState.gravity);
 		this.ships.draw(program, gameState.ships);
 		this.asteroids.draw(program, gameState.asteroids);
 		this.explosions.draw(program, gameState);
+		this.glowblur(1.0, 1.0, 10);*/
+		this.debug.draw(program, gameState.gravity);
+		this.explosions.draw(program, gameState);
 		this.glowblur(1.0, 1.0, 10);
 
-
-
 		WebGL.setRenderTarget(null);
-
+		//WebGL.beginDraw([0.0, 0.0, 0.0, 1]);
 		//Utils.drawRectangleColor(this.colorProgram, new Float32Array([0, 0]), new Float32Array([1, 1]), new Float32Array([0.0, 0.0, 0.0, 1.0]), new Float32Array([1, 1]));
 		//WebGL.beginDraw([0.0, 0.0, 0.0, 1.0]);
 
 		WebGL.useProgram(program);
 		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
-		this.debug.draw(program, gameState.gravity);
+		//this.debug.draw(program, gameState.gravity);
 		this.ships.draw(program, gameState.ships);
 		this.asteroids.draw(program, gameState.asteroids);
 		//this.glowblur(shake * 0.02, shake * 0.02);
 
 
 		WebGL.useProgram(program);
-		Utils.drawRectangleColor(this.colorProgram, [0, 0], [1, 1], [1.0, 0.0, 0.0, 0.1], [1, 1]);
+		//Utils.drawRectangleColor(this.colorProgram, [0, 0], [1, 1], [1.0, 0.0, 0.0, 0.1], [1, 1]);
 		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
 		this.miniMap.draw(program, gameState, focusPoint, activeShip.id);
 

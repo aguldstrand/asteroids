@@ -55,11 +55,6 @@ Projectile.prototype.move = function(secs) {
 			this.applyNewPositions(projectile, direction, secs);
 
 
-			if (projectile.pos.x >= this.SW || projectile.pos.x < 0 || projectile.pos.y < 0 || projectile.pos.y >= this.SH) {
-				ship[this.type].splice(projectileIndex, 1);
-				continue;
-			}
-
 
 			/*
 			if (this.checkCollisions(projectiles, projectileIndex, ships, shipIndex)) {
