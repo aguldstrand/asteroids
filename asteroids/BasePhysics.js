@@ -47,6 +47,7 @@ BasePhysics.prototype.checkOffMap = function() {
 	var pos = this.pos;
 	if (pos.x > this.SW || pos.x < 0 || pos.y > this.SH || pos.y < 0) {
 		this.handleOffMap();
+
 	}
 };
 

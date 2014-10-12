@@ -144,7 +144,7 @@ define(['hektorskraffs/webgl'], function(WebGL) {
 						pp.p.y = posY;
 						pp.life = Math.random() * 100 + 20;
 						pp.drift = Math.random() * 50 - 25;
-						pp.fall = Math.random() * 20 - 15;
+						pp.fall = Math.random() * 20 - 10;
 						this.pixelPoints.push(pp);
 
 					}

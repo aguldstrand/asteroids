@@ -6,6 +6,7 @@ define([
 	'monitor/gui/objects/Asteroids',
 	'monitor/gui/objects/Debug',
 	'monitor/gui/objects/MiniMap',
+	'monitor/gui/objects/StarGrid',
 
 	'monitor/gui/objects/Camera',
 
@@ -22,6 +23,7 @@ define([
 	Asteroids,
 	Debug,
 	MiniMap,
+	StarGrid,
 
 	Camera,
 
@@ -61,6 +63,7 @@ define([
 		this.asteroids = new Asteroids(this.pixel, this.SW, this.SH);
 		this.debug = new Debug(this.pixel, this.SW, this.SH);
 		this.miniMap = new MiniMap(this.pixel, this.SW, this.SH);
+		this.starGrid = new StarGrid(this.pixel, this.SW, this.SH);
 
 		this.camera = new Camera();
 	};
@@ -140,116 +143,6 @@ define([
 	};
 
 
-
-	ScreenComponent.prototype.update = function(step, gameState) {
-
-
-		var polys = [];
-		var numPolys = 0;
-
-
-
-		//focus
-		var focusPoint = {
-			x: 0,
-			y: 0
-		};
-		var activeShip = null;
-		if (gameState.ships && gameState.ships.length > 0) {
-			var len = gameState.ships.length;
-
-			for (var i = 0; i < len; i++) {
-				var ship = gameState.ships[i];
-				if (ship.id === window.io.socket.sessionid) {
-					activeShip = ship;
-					break;
-				}
-			}
-			if (activeShip) {
-				focusPoint.x = activeShip.pos.x - this.SW * 0.5;
-				focusPoint.y = activeShip.pos.y - this.SH * 0.5;
-				if (focusPoint.x < 0) {
-					focusPoint.x = 0;
-				}
-				if (focusPoint.x > gameState.SW - this.SW) {
-					focusPoint.x = gameState.SW - this.SW;
-				}
-				if (focusPoint.y < 0) {
-					focusPoint.y = 0;
-				}
-				if (focusPoint.y > gameState.SH - this.SH) {
-					focusPoint.y = gameState.SH - this.SH;
-				}
-			}
-		}
-
-
-		var numExplosions = gameState.explosions.length;
-		if (numExplosions > 0) {
-			focusPoint.y += (Math.random() - 0.5) * numExplosions * 30;
-			focusPoint.x += (Math.random() - 0.5) * numExplosions * 30;
-		}
-
-
-		Poly.setFocusPoint(focusPoint);
-
-		//CLEAR
-		polys = [];
-		numPolys = Poly.addS(0, 0, this.SW * this.pixel, this.SH * this.pixel, polys);
-		this.draw(polys, numPolys, 0, 0, 0, 1);
-
-		//STARMAP
-		polys = [];
-		numPolys = this.starmap1.update(step, polys, focusPoint);
-		this.draw(polys, numPolys, 1, 1, 0, 1);
-
-		polys = [];
-		numPolys = this.starmap2.update(step, polys, focusPoint);
-		this.draw(polys, numPolys, 1, 1, 0, 1);
-
-		//EXPLOSIONS
-		polys = [];
-		numPolys = this.explosions.update(step, polys, gameState.explosions);
-		this.draw(polys, numPolys, 1, 1, 0, 1);
-
-
-
-		//Asteroids
-		polys = [];
-		numPolys = this.asteroids.update(step, polys, gameState.asteroids);
-		this.draw(polys, numPolys, 0.5, 0.5, 0.5, 1);
-
-
-		//gravity - debug
-		polys = [];
-		numPolys = this.debug.update(step, polys, gameState.gravity, focusPoint);
-		this.draw(polys, numPolys, 1, 0, 0, 1);
-
-
-		//minimap BG
-		/*polys = [];
-		numPolys = Poly.addS(0, 0, 150, 150, polys, false, false, 0, 0);
-		this.draw(polys, numPolys, 0, 0, 0, 0.8);*/
-
-		//Minimap
-		polys = [];
-		numPolys = this.miniMap.updateAsteroids(step, polys, gameState);
-		this.draw(polys, numPolys, 0.5, 0.5, 0.5, 1);
-
-		polys = [];
-		numPolys = this.miniMap.updateShips(step, polys, gameState);
-		this.draw(polys, numPolys, 0, 1, 0, 1);
-
-
-
-		//FPS BAR
-		polys = [];
-		numPolys = Poly.add(500, 5, step * 10, 4, polys);
-		this.draw(polys, numPolys, 1, 0, 0, 1);
-
-
-
-	};
 
 	ScreenComponent.prototype.drawing = function(step, gameState) {
 
@@ -346,7 +239,7 @@ define([
 		this.glowblur(1.0, 1.0, 10);*/
 		this.debug.draw(program, gameState.gravity);
 		this.explosions.draw(program, gameState);
-		this.glowblur(1.0, 1.0, 10);
+		this.glowblur(1.0, 1.0, Math.random() * 15);
 
 		WebGL.setRenderTarget(null);
 		//WebGL.beginDraw([0.0, 0.0, 0.0, 1]);
@@ -355,6 +248,7 @@ define([
 
 		WebGL.useProgram(program);
 		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
+		this.starGrid.draw(program);
 		//this.debug.draw(program, gameState.gravity);
 		this.ships.draw(program, gameState.ships);
 		this.asteroids.draw(program, gameState.asteroids);

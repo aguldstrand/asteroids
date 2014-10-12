@@ -72,29 +72,7 @@ Base.prototype.applyNewPositions = function(obj /*BasePhysics*/ , acc /*Point*/ 
 	obj.pos.y += obj.vel.y * secs;
 
 
-	if (behaviour) {
-		behaviour(obj);
-	} else {
-		if (obj.pos.x > this.SW) {
-			obj.pos.x = 0;
-		}
-		if (obj.pos.y > this.SH) {
-			obj.pos.y = 0;
-		}
-
-		if (obj.pos.x < 0) {
-			obj.pos.x = this.SW - 1;
-		}
-		if (obj.pos.y < 0) {
-			obj.pos.y = this.SH - 1;
-		}
-	}
-
-
-	if (obj.pos.x > 3000 || obj.pos.x < 0 || obj.pos.y < 0 || obj.pos.y > 3000) {
-		console.log(obj);
-		throw 'fuck @ applyNewPositions';
-	}
+	obj.checkOffMap();
 
 
 };

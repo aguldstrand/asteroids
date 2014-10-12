@@ -76,6 +76,10 @@ Grid.prototype.add = function(type, items) {
 	for (var i = 0; i < len; i++) {
 		var item = items[i];
 
+		item.checkOffMap();
+		if (item.splice) {
+			continue;
+		}
 
 
 		var x = Math.min(parseInt(item.pos.x / this.SWR, 10), maxResolution);
@@ -121,6 +125,11 @@ Grid.prototype.add = function(type, items) {
 };
 
 Grid.prototype.getType = function(type, item) {
+
+	item.checkOffMap();
+	if (item.splice) {
+		return [];
+	}
 
 	var x = parseInt(item.pos.x / this.SWR, 10);
 	var y = parseInt(item.pos.y / this.SHR, 10);
