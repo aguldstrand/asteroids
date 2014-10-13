@@ -28,7 +28,11 @@ define([
 				},
 				friction: 1,
 				gravity: 0,
-				life: 10
+				life: 10,
+				target: {
+					x: 0,
+					y: 0
+				}
 			});
 		}
 	};
@@ -42,7 +46,7 @@ define([
 		for (var i = 0; i < len; i++) {
 			var particle = particles[i];
 
-			if (particle.life < 0) {
+			if (particle.pos.x - particle.target.x < 25 && particle.pos.y - particle.target.y < 25 || particle.life < 0) {
 				var recycledParticle = particles.splice(i, 1)[0];
 				this.pool.push(recycledParticle);
 				len--;
@@ -62,28 +66,32 @@ define([
 	};
 
 
-	ParticleSystem.prototype.add = function(amount, pos, vel, life, gravity, friction) {
+	ParticleSystem.prototype.add = function(amount, pos, spread, life) {
 
 		amount = Math.min(this.pool.length - 1, amount);
 		life = life || 10;
-		gravity = gravity || 1;
-		friction = friction || 1;
+		//gravity = gravity || 1;
+		//friction = friction || 1;
 
 		for (var i = 0; i < amount; i++) {
 			var particle = this.pool.pop();
 
-			var p = this.___normalize({
-				x: vel.x * Math.random() - (vel.x * 0.5),
-				y: vel.y * Math.random() - (vel.y * 0.5)
-			}, vel.x + vel.y);
 
-			particle.pos.x = pos.x;
-			particle.pos.y = pos.y;
+
+			//var velX = Math.random() * spread - (spread * 0.5);
+			//var velY = Math.random() * spread - (spread * 0.5);
+			var p = this.___normalize({
+				x: Math.random() * spread - (spread * 0.5),
+				y: Math.random() * spread - (spread * 0.5)
+			}, spread + Math.random() * spread * 0.22);
+
+
+			particle.pos.x = pos.x + p.x * -100;
+			particle.pos.y = pos.y + p.y * -100;
 			particle.vel.x = p.x;
 			particle.vel.y = p.y;
-			particle.life = life * Math.random() - (life * 0.5);
-			particle.friction = friction;
-			particle.gravity = gravity;
+			particle.life = life;
+
 			this.particles.push(particle);
 		}
 

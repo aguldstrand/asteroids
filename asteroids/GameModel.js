@@ -9,7 +9,8 @@ function GameModel() {
 	this.SH = 3000;
 	this.gravity = [];
 	this.staticGravity = [];
-
+	this.warpFrom = {};
+	this.warpTo = {};
 
 	/*for (var i = 0; i < 200000; i++) {
 		this.test = [];
@@ -26,7 +27,10 @@ GameModel.prototype.toJSON = function() {
 		explosions: this.explosions,
 		SW: this.SW,
 		SH: this.SH,
-		gravity: this.staticGravity
+		//gravity: this.staticGravity,
+		warpTo: this.warpTo,
+		warpFrom: this.warpFrom
+
 
 	};
 };

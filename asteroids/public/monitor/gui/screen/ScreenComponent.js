@@ -237,9 +237,9 @@ define([
 		this.asteroids.draw(program, gameState.asteroids);
 		this.explosions.draw(program, gameState);
 		this.glowblur(1.0, 1.0, 10);*/
-		this.debug.draw(program, gameState.gravity);
+		this.debug.draw(program, gameState);
 		this.explosions.draw(program, gameState);
-		this.glowblur(1.0, 1.0, Math.random() * 15);
+		this.glowblur(1.0, 1.0, 10); //Math.random() * 15);
 
 		WebGL.setRenderTarget(null);
 		//WebGL.beginDraw([0.0, 0.0, 0.0, 1]);

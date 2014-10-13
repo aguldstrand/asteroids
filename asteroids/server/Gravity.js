@@ -7,14 +7,19 @@ function Gravity(options) {
 
 	Base.call(this, options);
 
+	var warpTo = new Point(400, 400);
+	var warpFrom = new Point(2500, 2500);
+
+	this.gameModel.warpTo = warpTo;
+	this.gameModel.warpFrom = warpFrom;
+
 	this.createStatic({
-		pos: new Point(400, 400),
+		pos: warpTo,
 		size: 10
 	}, 1);
 
-
 	this.createStatic({
-		pos: new Point(2500, 2500),
+		pos: warpFrom,
 		size: 10
 	}, -1, new Point(400, 400));
 }

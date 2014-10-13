@@ -1,6 +1,8 @@
 define(['monitor/gui/objects/Poly',
-	'hektorskraffs/webgl'
-], function(Poly, WebGL) {
+	'hektorskraffs/webgl',
+	'./ParticleSystem',
+	'./RParticleSystem'
+], function(Poly, WebGL, ParticleSystem, RParticleSystem) {
 	function Debug(pixel, SW, SH) {
 		this.pixel = pixel;
 		this.SH = SH;
@@ -9,6 +11,9 @@ define(['monitor/gui/objects/Poly',
 
 
 		this.load();
+
+		this.ps = new ParticleSystem(2400);
+		this.rps = new RParticleSystem(2400);
 
 	}
 
@@ -25,38 +30,25 @@ define(['monitor/gui/objects/Poly',
 	};
 
 
-	Debug.prototype.draw = function(program, gravity) {
+	Debug.prototype.draw = function(program, gameModel) {
 
+
+		//this.___polygonMode(program, gameModel);
+		this.___particleMode(program, gameModel);
+	};
+	Debug.prototype.___polygonMode = function(program, gameModel) {
+
+		var gravity = gameModel.gravity;
 
 		var uniforms = program.uniforms;
-
-
 
 		var positionLocation = uniforms.u_position;
 		var rotationLocation = uniforms.u_rotation;
 		var scaleLocation = uniforms.u_scale;
 
-		//var DEG_TO_RAD = Math.PI / 180.0;
-
 		var gl = WebGL.gl;
 
-
-
 		var gravityRes = 50;
-
-
-		/*WebGL.bindAttribBuffer(this.gravityBeamVertices.vertexBuffer, program.attributes.a_position, this.gravityBeamVertices.itemSize);
-		WebGL.bindUniform(uniforms.u_color, [0, 0, 0, 0.01]);
-
-		
-
-		gl.uniform2f(positionLocation, 0, 0);
-		gl.uniform1f(rotationLocation, 0);
-		gl.uniform2f(scaleLocation, 100000, 100000);
-
-		gl.drawArrays(gl.TRIANGLES, 0, this.gravityBeamVertices.vertexCount);*/
-
-
 
 		var yMax = parseInt(3000 / gravityRes, 10);
 		var xMax = parseInt(3000 / gravityRes, 10);
@@ -87,6 +79,53 @@ define(['monitor/gui/objects/Poly',
 				//numPolys += Poly.addR(x * gravityRes, y * gravityRes, 0, 0, 2, 2, 0, 2, polys, 1);
 			}
 		}
+	};
+
+	Debug.prototype.___particleMode = function(program, gameModel) {
+
+		//window.tracker.outFixed('ps', this.ps.pool[0]);
+		var vertices = [];
+
+
+		this.ps.add(150, gameModel.warpTo, {
+			x: 5,
+			y: 5
+		}, 100);
+
+		vertices = vertices.concat(this.ps.update(1));
+		//vertices = this.ps.update(1);
+
+
+		this.rps.add(25, gameModel.warpFrom, 5, 100);
+
+		vertices = vertices.concat(this.rps.update(1));
+
+		var vertPol = WebGL.createPolygon(vertices);
+
+		var uniforms = program.uniforms;
+
+		var positionLocation = uniforms.u_position;
+		var rotationLocation = uniforms.u_rotation;
+		var scaleLocation = uniforms.u_scale;
+
+
+
+		var gl = WebGL.gl;
+
+
+
+		WebGL.bindAttribBuffer(vertPol.vertexBuffer, program.attributes.a_position, vertPol.itemSize);
+
+		WebGL.bindUniform(uniforms.u_color, this.color);
+
+		//window.tracker.outFixed(s, epp[s].x + ' ' + epp[s].y + ' ' + epp[s].r);
+
+		gl.uniform2f(positionLocation, 0, 0);
+		gl.uniform1f(rotationLocation, 0);
+		gl.uniform2f(scaleLocation, 1, 1);
+
+
+		gl.drawArrays(gl.LINES, 0, vertPol.vertexCount);
 	};
 
 
