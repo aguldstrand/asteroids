@@ -1,10 +1,10 @@
 define([
 	'monitor/gui/objects/Poly',
-
+	'./ParticleSystem',
 	'hektorskraffs/webgl'
 ], function(
 	Poly,
-
+	ParticleSystem,
 	WebGL
 ) {
 	function Ships(pixel, SW, SH) {
@@ -19,6 +19,8 @@ define([
 		this.dp_rotation = 0;
 		this.ds_rotation = 0;
 		this.d_rotation = 0;
+
+		this.ps = new ParticleSystem(2400);
 
 		this.color = [0, 1, 0, 1];
 
@@ -58,6 +60,10 @@ define([
 		this.bulletPolygon = WebGL.createPolygon(bulletVertices);
 	};
 
+	Ships.prototype.drawParticles = function(program) {
+		var pvert = this.ps.update(1);
+		this.ps.draw(program, pvert);
+	};
 
 
 	Ships.prototype.draw = function(program, ships) {
@@ -157,8 +163,17 @@ define([
 				gl.uniform2f(scaleLocation, 25.0, 10.0);
 
 				gl.drawArrays(gl.TRIANGLES, 0, this.bulletPolygon.vertexCount);
+
+
+				this.ps.add(15, rocket.pos, {
+					x: 0.01,
+					y: 0.01
+				}, 150, 1, 1, 100);
 			}
 		}
+
+
+
 	};
 
 

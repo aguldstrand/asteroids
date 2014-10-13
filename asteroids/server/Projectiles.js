@@ -97,6 +97,8 @@ Projectile.prototype.collide = function() {
 		var ship = collidables[i];
 		if (ship.handleCollision(item)) {
 			that.createExplosion(ship.diam * 5, ship.pos);
+		} else {
+			that.createExplosion(1, ship.pos);
 		}
 
 		var projectile = options.projectiles[options.projectileIndex];

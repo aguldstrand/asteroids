@@ -100,6 +100,10 @@ define(['monitor/gui/objects/Poly',
 
 		vertices = vertices.concat(this.rps.update(1));
 
+
+		this.ps.draw(program, vertices);
+
+		/*
 		var vertPol = WebGL.createPolygon(vertices);
 
 		var uniforms = program.uniforms;
@@ -125,7 +129,7 @@ define(['monitor/gui/objects/Poly',
 		gl.uniform2f(scaleLocation, 1, 1);
 
 
-		gl.drawArrays(gl.LINES, 0, vertPol.vertexCount);
+		gl.drawArrays(gl.LINES, 0, vertPol.vertexCount);*/
 	};
 
 

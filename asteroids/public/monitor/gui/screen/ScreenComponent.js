@@ -220,39 +220,21 @@ define([
 
 
 
-		//if (shake > 0) {
-		/*this.debug.draw(program, gameState.gravity);
-		this.ships.draw(program, gameState.ships);
-		this.asteroids.draw(program, gameState.asteroids);
-		this.explosions.draw(program, gameState);*/
-		//this.glowblur(shake * 0.1, shake * 0.1, 1);
-		//this.glowblur(focusPoint.x - this.oldFocusPoint.x, focusPoint.y - this.oldFocusPoint.y, 1);
-		/*} else {
-			this.explosions.draw(program, gameState);
-
-			this.glowblur(1.0, 1.0, 10);
-		}*/
-		/*this.debug.draw(program, gameState.gravity);
-		this.ships.draw(program, gameState.ships);
-		this.asteroids.draw(program, gameState.asteroids);
-		this.explosions.draw(program, gameState);
-		this.glowblur(1.0, 1.0, 10);*/
 		this.debug.draw(program, gameState);
+		this.ships.drawParticles(program);
 		this.explosions.draw(program, gameState);
 		this.glowblur(1.0, 1.0, 10); //Math.random() * 15);
 
 		WebGL.setRenderTarget(null);
-		//WebGL.beginDraw([0.0, 0.0, 0.0, 1]);
-		//Utils.drawRectangleColor(this.colorProgram, new Float32Array([0, 0]), new Float32Array([1, 1]), new Float32Array([0.0, 0.0, 0.0, 1.0]), new Float32Array([1, 1]));
-		//WebGL.beginDraw([0.0, 0.0, 0.0, 1.0]);
+
 
 		WebGL.useProgram(program);
 		WebGL.bindUniform(program.uniforms.u_camera, this.camera.position);
 		this.starGrid.draw(program);
-		//this.debug.draw(program, gameState.gravity);
+
 		this.ships.draw(program, gameState.ships);
 		this.asteroids.draw(program, gameState.asteroids);
-		//this.glowblur(shake * 0.02, shake * 0.02);
+
 
 
 		WebGL.useProgram(program);
