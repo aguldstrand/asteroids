@@ -1,6 +1,6 @@
 var c = {
-	SW: 3000,
-	SH: 3000
+	SW: 9000,
+	SH: 9000
 };
 
 module.exports = c;

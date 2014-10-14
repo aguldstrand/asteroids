@@ -1,5 +1,5 @@
 define([
-	'hektorskraffs/webgl',
+	'hektorskraffs/webgl'
 ], function(
 	WebGL
 ) {

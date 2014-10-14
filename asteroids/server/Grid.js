@@ -1,3 +1,5 @@
+var gConstants = require('../constants/GConstants');
+
 function Grid(options) {
 
 
@@ -134,7 +136,7 @@ Grid.prototype.getType = function(type, item) {
 	var x = parseInt(item.pos.x / this.SWR, 10);
 	var y = parseInt(item.pos.y / this.SHR, 10);
 
-	if (item.pos.x > 3000 || item.pos.x < 0 || item.pos.y < 0 || item.pos.y > 3000) {
+	if (item.pos.x > gConstants.SW || item.pos.x < 0 || item.pos.y < 0 || item.pos.y > gConstants.SH) {
 		console.log(item);
 		throw 'fuck, accessed item outside map,';
 	}

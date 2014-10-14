@@ -1,3 +1,5 @@
+var gConstants = require('./constants/GConstants');
+
 function GameModel() {
 	this.userInputs = {};
 
@@ -5,8 +7,8 @@ function GameModel() {
 	this.asteroids = [];
 	this.explosions = [];
 
-	this.SW = 3000;
-	this.SH = 3000;
+	this.SW = gConstants.SW;
+	this.SH = gConstants.SH;
 	this.gravity = [];
 	this.staticGravity = [];
 	this.warpFrom = {};
